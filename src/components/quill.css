@@ -1,0 +1,5 @@
+.ql-editor {
+  direction: rtl; /* يغير اتجاه النصوص */
+  text-align: right; /* محاذاة النصوص إلى اليمين */
+  color: inherit !important;
+}

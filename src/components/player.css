@@ -1,0 +1,9 @@
+/* تعطيل التفاعل مع الفيديو بشكل كامل */
+.plyr__video-wrapper {
+  pointer-events: none !important;
+}
+
+/* إذا كنت بحاجة لتخصيص التفاعل فقط على شاشة الفيديو */
+.plyr__video-wrapper video {
+  pointer-events: none !important; /* منع التفاعل مع الفيديو نفسه */
+}

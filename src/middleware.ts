@@ -6,7 +6,7 @@ const allowedOrigins =
     ? [
         "https://el-qema.com",
         "https://www.el-qema.com",
-        "http://localhost:3000",
+        `https://${process.env.VERCEL_URL}`, // include Vercel deployment domain
       ]
     : ["http://localhost:3000"];
 
@@ -17,6 +17,11 @@ const signRoute = ["/sign-in", "/sign-up"];
 const allowedDashboardRoles = ["ADMIN", "CONSTRUCTOR"];
 
 export default auth(async (req) => {
+  // Allow NextAuth auth routes through without origin checks
+  if (req.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
   const isAuthRotue = AuthRoutes.includes(req.nextUrl.pathname);
   const origin = req.headers.get("origin");

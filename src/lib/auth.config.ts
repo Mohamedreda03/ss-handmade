@@ -42,7 +42,15 @@ export default {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
+
     Credentials({
       async authorize(credentials: any) {
         const { email, password } = credentials;

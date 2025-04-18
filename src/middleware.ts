@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "./auth";
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [
-        "https://el-qema.com",
-        "https://www.el-qema.com",
-        `https://${process.env.VERCEL_URL}`, // include Vercel deployment domain
-      ]
-    : ["http://localhost:3000"];
+const allowedOrigins = ["http://localhost:3000"];
 
 const AuthRoutes = ["/profile", "/student_courses", "/wallet"];
 

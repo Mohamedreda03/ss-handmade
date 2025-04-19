@@ -54,6 +54,10 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -77,11 +81,7 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
     };
 
     fetchProduct();
-  }, [params.id]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
+  }, [params.id, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {

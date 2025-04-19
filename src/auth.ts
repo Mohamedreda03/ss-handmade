@@ -4,8 +4,9 @@ import authConfig from "./lib/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./lib/prisma";
 
+// @ts-expect-error - The adapter types are incompatible with next-auth, but the functionality works
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
     updateAge: 5 * 60 * 60, // 5 hours

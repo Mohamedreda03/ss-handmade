@@ -1,26 +1,20 @@
 import { NextResponse } from "next/server";
 import { auth } from "./auth";
 
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [
+        "https://el-qema.com",
+        "https://www.el-qema.com",
+        "http://localhost:3000",
+      ]
+    : ["http://localhost:3000"];
+
 const AuthRoutes = ["/profile", "/student_courses", "/wallet"];
 
 const signRoute = ["/sign-in", "/sign-up"];
 
 const allowedDashboardRoles = ["ADMIN", "CONSTRUCTOR"];
-
-// Define which routes should bypass dynamic checks during static generation
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - API routes that use dynamic features (headers, cookies, etc.)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!api/|_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|gif|png|svg)).*)",
-  ],
-};
 
 export default auth(async (req) => {
   const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
@@ -30,6 +24,10 @@ export default auth(async (req) => {
   const isDashboardAllowed = allowedDashboardRoles.includes(
     req.auth?.user?.role!
   );
+
+  if (origin && !allowedOrigins.includes(origin)) {
+    return new Response("Forbidden", { status: 403 });
+  }
 
   if (req.auth?.user && signRoute.includes(req.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/", req.nextUrl).toString());

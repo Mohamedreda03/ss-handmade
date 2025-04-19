@@ -9,12 +9,6 @@ import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from "@next/third-parties/google";
-// Import dynamic configuration to make routes dynamic
-import { dynamic } from "./dynamic-config";
-
-// Export dynamic and runtime settings
-export { dynamic };
-export const runtime = "nodejs";
 
 const dgagnadeen = localFont({
   src: [

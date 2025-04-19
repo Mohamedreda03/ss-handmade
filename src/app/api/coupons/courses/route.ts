@@ -3,9 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { dashRoles } from "@/lib/dashRoles";
 import { auth } from "@/auth";
 
-// Mark this route as dynamic to avoid static generation issues
-export const dynamic = "force-dynamic";
-
 interface Course {
   id: string;
   title: string;

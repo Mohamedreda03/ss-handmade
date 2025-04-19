@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import axios from "axios";
 import { useQuery } from "react-query";
 
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 export default function ProfilePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["userProfile"],

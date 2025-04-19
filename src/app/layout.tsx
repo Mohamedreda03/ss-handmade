@@ -9,13 +9,12 @@ import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from "@next/third-parties/google";
+// Import dynamic configuration to make routes dynamic
+import { dynamic } from "./dynamic-config";
 
-// import { Cairo } from "next/font/google";
-
-// const cairo = Cairo({
-//   weight: ["200", "300", "400", "500", "600", "700", "800", "900", "1000"],
-//   subsets: ["arabic"],
-// });
+// Export dynamic and runtime settings
+export { dynamic };
+export const runtime = "nodejs";
 
 const dgagnadeen = localFont({
   src: [

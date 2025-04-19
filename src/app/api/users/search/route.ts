@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { CenterOrOnline } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+// Mark this route as dynamic to avoid static generation issues with searchParams
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const name = req.nextUrl.searchParams.get("name") as string;

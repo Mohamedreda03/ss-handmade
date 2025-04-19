@@ -2,6 +2,9 @@ import { isAuth } from "@/actions/isAuth";
 import { auth } from "@/auth";
 import { NextResponse, NextRequest } from "next/server";
 
+// Mark this route as dynamic to avoid static generation issues
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const isUserAuth = await isAuth();

@@ -5,7 +5,7 @@ import Loading from "@/components/Loading";
 import axios from "axios";
 import { useQuery } from "react-query";
 
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 export default function StudentCourses() {
   const { data, isLoading } = useQuery({
     queryKey: "subscriptions",

@@ -78,31 +78,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <AuthChecker>
-        <Providers>
-          <body
-            className={cn(
-              dgagnadeen.variable,
-              "font-dgagnadeen dark:bg-dark_background"
-            )}
+      <Providers>
+        <body
+          className={cn(
+            dgagnadeen.variable,
+            "font-dgagnadeen dark:bg-dark_background"
+          )}
+        >
+          <NextTopLoader height={3} showSpinner={false} />
+          <ThemeProvider
+            attribute="light"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
           >
-            <NextTopLoader height={3} showSpinner={false} />
-            <ThemeProvider
-              attribute="light"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Toaster />
-              {children}
-              <ShadcnToaster />
-            </ThemeProvider>
-          </body>
-          <GoogleAnalytics
-            gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!}
-          />
-        </Providers>
-      </AuthChecker>
+            <Toaster />
+            {children}
+            <ShadcnToaster />
+          </ThemeProvider>
+        </body>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!} />
+      </Providers>
     </html>
   );
 }

@@ -35,21 +35,20 @@ export default function Navbar() {
   }, [pathname]);
 
   const navLinks = [
-    { name: "الرئيسية", href: "/" },
-    { name: "الدورات", href: "/courses" },
-    { name: "قصص النجاح", href: "/success-stories" },
-    { name: "المنتجات", href: "/products" },
     { name: "من نحن", href: "/about" },
+    { name: "المنتجات", href: "/products" },
+    { name: "قصص النجاح", href: "/success-stories" },
+    { name: "الدورات", href: "/course" },
+    { name: "الرئيسية", href: "/" },
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[1000] bg-primary text-white shadow-sm w-full">
       <div className="container mx-auto">
-        <nav className="flex items-center justify-between flex-row-reverse h-[80px] px-4">
+        <nav className="flex items-center justify-between flex-row h-[80px] px-4">
           {/* User and Cart Icons (Left side) */}
           <div className="flex items-center gap-6">
-            {/* User Icon with Dropdown for Auth */}
-            {/* Cart Icon with Counter */}
+            <AuthMenu session={session} />
             <Link
               href="/cart"
               className="relative p-2 hover:bg-primary-darker rounded-full"
@@ -62,7 +61,6 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <AuthMenu session={session} />
           </div>
 
           {/* Mobile Menu Button */}

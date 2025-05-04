@@ -1,12 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Brain, Package } from "lucide-react";
+import { Brain, Package, Star } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export const navigationMenu = [
   { name: "الكورسات", href: "/course", Icon: Brain },
+  { name: "قصص النجاح", href: "/success-stories", Icon: Star },
   { name: "المنتجات", href: "/products", Icon: Package },
 ];
 

@@ -70,6 +70,9 @@ model User {
 
   // Add relation to accounts for OAuth
   accounts Account[]
+
+  // User success stories
+  successStories SuccessStory[]
 }
 
 enum Gender {
@@ -456,4 +459,22 @@ enum OrderStatus {
 enum ProductType {
   HANDMADE
   EQUIPMENT
+}
+
+model SuccessStory {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  profession  String
+  story       String   @db.Text
+  achievement String
+  course      String?
+  imageUrl    String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  isFeature   Boolean  @default(false) // Featured on homepage
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }

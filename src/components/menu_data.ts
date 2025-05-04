@@ -11,6 +11,7 @@ import {
   FlaskConical,
   Package,
   ShoppingBag,
+  Star,
 } from "lucide-react";
 
 interface MenuData {
@@ -84,6 +85,13 @@ export const admin_menu_data: MenuData[] = [
     link: `/admin/orders`,
     title: "الطلبات",
     Icon: ShoppingBag,
+    role: ["ADMIN"],
+  },
+  {
+    id: 9,
+    link: `/admin/success-stories`,
+    title: "قصص النجاح",
+    Icon: Star,
     role: ["ADMIN"],
   },
 ];

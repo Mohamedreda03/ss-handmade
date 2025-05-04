@@ -20,21 +20,18 @@ export default function AboutUsSection() {
             alt="About Us"
             width={500}
             height={500}
-            className="hidden md:block"
           />
           <Image
             src="/about/about-2.svg"
             alt="About Us"
             width={500}
             height={500}
-            className="hidden md:block"
           />
           <Image
             src="/about/about-3.svg"
             alt="About Us"
             width={500}
             height={500}
-            className="hidden md:block"
           />
         </div>
       </div>

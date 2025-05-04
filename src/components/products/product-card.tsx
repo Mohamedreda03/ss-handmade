@@ -66,8 +66,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </Link>
       <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-2xl font-medium text-right flex-grow ml-2">
+        <div className="text-right">
+          <h3
+            className="text-2xl font-medium mb-1 line-clamp-1 overflow-hidden"
+            dir="rtl"
+          >
             {product.name}
           </h3>
 

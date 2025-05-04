@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        "el-messiri": ["var(--font-el-messiri)"],
+        dgagnadeen: ["var(--font-dgagnadeen)"],
+      },
       colors: {
         keyframes: {
           "accordion-down": {

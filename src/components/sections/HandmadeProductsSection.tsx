@@ -24,7 +24,7 @@ type FilterType = "all" | "student" | "platform";
 
 const HandmadeProductsSection = () => {
   const [filter, setFilter] = useState<FilterType>("all");
-  const maxProducts = 8;
+  const maxProducts = 6;
 
   // استخدام React Query لجلب البيانات مع الفلتر
   const { data: products = [], isLoading } = useQuery<ProductWithCreator[]>(

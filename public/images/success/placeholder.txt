@@ -1,0 +1,6 @@
+This directory should contain the following images:
+- ahmed.jpg (for Ahmed's success story)
+- sara.jpg (for Sara's success story)
+- khaled.jpg (for Khaled's success story)
+ 
+These images should be professional headshots or profile pictures of people representing success stories. The ideal dimensions are approximately 500x500 pixels or larger, with a 1:1 aspect ratio. 

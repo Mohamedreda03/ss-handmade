@@ -17,6 +17,7 @@ const elMessiri = El_Messiri({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-el-messiri",
+  display: "swap",
 });
 
 const dgagnadeen = localFont({
@@ -90,8 +91,9 @@ export default function RootLayout({
       <Providers>
         <body
           className={cn(
+            elMessiri.variable,
             dgagnadeen.variable,
-            "font-dgagnadeen dark:bg-dark_background"
+            "font-el-messiri dark:bg-dark_background"
           )}
         >
           <NextTopLoader height={3} showSpinner={false} />

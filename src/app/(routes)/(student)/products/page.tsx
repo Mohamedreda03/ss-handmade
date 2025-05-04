@@ -221,16 +221,18 @@ export default function ProductsPage() {
       </div>
 
       {isLoading ? (
-        <Loading className="h-[500px] flex items-center justify-center" />
+        <div className="min-h-[600px] flex items-center justify-center">
+          <Loading className="h-[500px]" />
+        </div>
       ) : isFetching ? (
-        <div className="relative h-[500px]">
+        <div className="relative min-h-[600px]">
           <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
             <div className="bg-card p-6 rounded-lg shadow-lg flex flex-col items-center">
               <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
               <p className="text-lg font-medium">جاري تحميل المنتجات...</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8 opacity-30">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 opacity-30">
             {products?.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -249,7 +251,7 @@ export default function ProductsPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 min-h-[600px]">
             {products?.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -257,7 +259,7 @@ export default function ProductsPage() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-10 gap-2 rtl:flex-row-reverse">
+            <div className="flex justify-center items-center mt-10 gap-2">
               <Button
                 variant="outline"
                 size="icon"

@@ -52,8 +52,9 @@ body,
     --chart-4: 70 29% 48%; /* Primary Darker: #3D402C */
     --chart-5: 60 100% 70%; /* Secondary Lighter: #FFFFC4 */
 
-    /* تعريف الخط المخصص */
+    /* تعريف الخطوط المخصصة */
     --font-dgagnadeen: "DGAgnadeen", Arial, sans-serif;
+    --font-el-messiri: "El Messiri", Arial, sans-serif;
   }
 
   .dark {
@@ -95,9 +96,13 @@ body,
     --chart-5: 60 28% 82%; /* Light 4: #D1D2C8 */
   }
 
-  /* تعريف خط واجهة المستخدم */
+  /* تعريف خطوط واجهة المستخدم */
   .font-dgagnadeen {
     font-family: var(--font-dgagnadeen);
+  }
+
+  .font-el-messiri {
+    font-family: var(--font-el-messiri);
   }
 }
 

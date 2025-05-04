@@ -113,7 +113,7 @@ export default function Page({
             className="text-lg"
             onClick={() =>
               router.push(
-                `/course/${searchParams.get("courseId")}/${searchParams.get(
+                `/courses/${searchParams.get("courseId")}/${searchParams.get(
                   "lessonId"
                 )}`
               )

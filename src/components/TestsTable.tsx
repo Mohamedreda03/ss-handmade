@@ -80,7 +80,7 @@ export default function TestsTable({
                     asChild
                     className="bg-blue-500 border border-blue-500 hover:bg-white hover:text-blue-600 hover:border-blue-500"
                   >
-                    <Link href={`/course/test/${test.id}`}>
+                    <Link href={`/courses/test/${test.id}`}>
                       استكمال الاختبار
                     </Link>
                   </Button>
@@ -94,7 +94,7 @@ export default function TestsTable({
                   className="bg-blue-500 border border-blue-500 hover:bg-white hover:text-blue-600 hover:border-blue-500"
                 >
                   <Link
-                    href={`/course/test/${test.id}/answers?lessonId=${lesson.id}&courseId=${courseId}`}
+                    href={`/courses/test/${test.id}/answers?lessonId=${lesson.id}&courseId=${courseId}`}
                   >
                     عرض الاجابات
                   </Link>

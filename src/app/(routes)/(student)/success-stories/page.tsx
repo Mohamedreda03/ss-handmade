@@ -287,7 +287,7 @@ export default function SuccessStoriesPage() {
         author={session?.user?.name || ""}
         authorTitle={session?.user?.name ? "طالب متميز" : ""}
         ctaText="ابدأ رحلتك التعليمية الآن"
-        ctaLink="/course"
+        ctaLink="/courses"
       />
 
       <motion.div
@@ -304,7 +304,7 @@ export default function SuccessStoriesPage() {
           وتغيير مسارك المهني
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/course">
+          <Link href="/courses">
             <Button className="bg-primary text-white px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">
               تصفح الدورات التعليمية
             </Button>

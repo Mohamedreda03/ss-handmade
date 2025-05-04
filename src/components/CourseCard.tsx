@@ -54,7 +54,7 @@ export default function CourseCard({
         <div className="h-[1px] w-[80%] bg-slate-100 dark:bg-slate-800 mx-auto my-4" />
         <div className="font-smaller shrink-0 flex flex-col md:flex-row md:items-center md:justify-center gap-3 mb-3">
           <Link
-            href={`/course/${course?.id}`}
+            href={`/courses/${course?.id}`}
             className="text-center border-2 border-first rounded-full px-3 py-1 hover:bg-first hover:text-white smooth clr-text-primary md:w-fit"
           >
             محتوي الكورس

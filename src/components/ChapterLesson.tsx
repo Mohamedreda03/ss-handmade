@@ -66,7 +66,7 @@ export default function ChapterLesson({
               })}
             >
               {isUserAuth && (isUserAdmin || isOwned || lesson.isFree) && (
-                <Link href={`/course/${courseId}/${lesson.id}`}>
+                <Link href={`/courses/${courseId}/${lesson.id}`}>
                   {lesson?.type === "file" && "فتح الملف"}
                   {lesson?.type === "video" && "شاهد الفيديو"}
                   {lesson?.type === "test" && "ابدأ الاختبار"}

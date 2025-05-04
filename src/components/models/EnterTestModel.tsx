@@ -33,7 +33,7 @@ export default function EnterTestModel({
         testEndTime: endTime,
       })
       .then((res) => {
-        router.push(`/course/test/${res.data.id}`);
+        router.push(`/courses/test/${res.data.id}`);
       })
       .catch(() => {
         toast.error("هناك امتحان مفتوح بالفعل يجب عليك انهائه اولا!");

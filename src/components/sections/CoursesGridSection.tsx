@@ -57,7 +57,7 @@ const CoursesGridSection = ({ courses = [] }: CoursesGridSectionProps) => {
 
                 <div className="flex justify-center mt-4">
                   <Link
-                    href={`/course/${course.id}`}
+                    href={`/courses/${course.id}`}
                     className="bg-[#6c7f60] text-white py-2 px-6 rounded-md w-full text-center font-semibold hover:bg-[#5a6b50] transition duration-300"
                   >
                     اشترك الآن

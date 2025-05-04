@@ -46,7 +46,7 @@ export default function TestTimer({
     },
     onSuccess: () => {
       toast.success("تم ارسال الاجابات بنجاح");
-      router.push(`/course/${courseId}/${lessonId}`);
+      router.push(`/courses/${courseId}/${lessonId}`);
     },
   });
 

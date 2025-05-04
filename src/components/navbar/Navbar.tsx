@@ -38,7 +38,7 @@ export default function Navbar() {
     { name: "من نحن", href: "/about" },
     { name: "المنتجات", href: "/products" },
     { name: "قصص النجاح", href: "/success-stories" },
-    { name: "الدورات", href: "/course" },
+    { name: "الدورات", href: "/courses" },
     { name: "الرئيسية", href: "/" },
   ];
 

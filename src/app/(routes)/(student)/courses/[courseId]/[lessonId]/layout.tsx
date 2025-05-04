@@ -16,6 +16,6 @@ export default async function LessonLayout({
   if (isOwned || isUserAdmin) {
     return children;
   } else {
-    redirect(`/course/${params.courseId}`);
+    redirect(`/courses/${params.courseId}`);
   }
 }

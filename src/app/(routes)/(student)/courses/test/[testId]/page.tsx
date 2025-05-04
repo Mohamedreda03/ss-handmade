@@ -23,7 +23,7 @@ export default function TestPage({ params }: { params: { testId: string } }) {
 
   if (data?.test?.isCompleted) {
     router.push(
-      `/course/${data.lesson.chapter.courseId}/${data.test.lessonId}`
+      `/courses/${data.lesson.chapter.courseId}/${data.test.lessonId}`
     );
     return;
   }

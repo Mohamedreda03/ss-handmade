@@ -108,7 +108,7 @@ export default function Test({
 
     router.refresh();
 
-    router.push(`/course/${courseId}/${lessonId}`);
+    router.push(`/courses/${courseId}/${lessonId}`);
   };
 
   return (

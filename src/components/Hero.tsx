@@ -43,7 +43,7 @@ const Hero = () => {
           </div>
 
           {/* القسم الأيسر: الصورة */}
-          <div className="w-full md:w-1/2 relative z-10 h-[300px] md:h-[400px] overflow-hidden shadow-xl bg-secondary border-secondary border-t-[20px] border-r-[20px] rounded-[45px]">
+          <div className="w-full md:w-1/2 relative z-10 h-[300px] md:h-[400px] overflow-hidden shadow-xl bg-secondary border-secondary border-t-[10px] border-r-[20px] rounded-[45px]">
             <Image
               src="/images/hero.avif"
               alt="الصناعة اليدوية"

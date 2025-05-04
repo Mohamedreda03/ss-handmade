@@ -111,11 +111,8 @@ export default function TestimonialsSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 text-gray-900 max-w-xl mx-auto leading-[50px]">
-            قصص نجاح طلابنا المميزين
+            ازاى الكورسات بتاعتنا غيرت حياة ناس كتير ؟ شوفوا معانا إزاي
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            تعرف على كيف غيرت دوراتنا حياة طلابنا وساعدتهم في تحقيق أحلامهم
-          </p>
         </div>
 
         {isLoading ? (

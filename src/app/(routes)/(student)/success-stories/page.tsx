@@ -215,22 +215,6 @@ export default function SuccessStoriesPage() {
                           قراءة المزيد
                         </Button>
                       </Link>
-                      <div className="flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full overflow-hidden relative">
-                          <Image
-                            src={
-                              story.user?.image ||
-                              "/images/success/default-user.jpg"
-                            }
-                            alt={story.user?.name || "User"}
-                            layout="fill"
-                            objectFit="cover"
-                          />
-                        </div>
-                        <span className="text-sm text-gray-600">
-                          {story.user?.name || "مستخدم"}
-                        </span>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>

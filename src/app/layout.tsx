@@ -62,22 +62,32 @@ const dgagnadeen = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "handmade",
-  description: "handmade corses and products",
-  keywords: "handmade, corses, products",
+  title: "handmade - منصة الحرف اليدوية",
+  description: "منصة تعليمية متخصصة في الحرف اليدوية وبيع المنتجات الحرفية",
+  keywords: "حرف يدوية، دورات، منتجات، تعليم، صناعة يدوية، حرفيين، handmade",
   openGraph: {
-    title: "handmade",
-    description: "handmade corses and products",
+    title: "handmade - منصة الحرف اليدوية",
+    description: "منصة تعليمية متخصصة في الحرف اليدوية وبيع المنتجات الحرفية",
     url: "",
     images: [
       {
-        url: "",
+        url: "/icons/handmade-favicon.svg",
         alt: "handmade",
       },
     ],
   },
   icons: {
-    icon: ["/favicon.ico"],
+    icon: [
+      { url: "/icons/handmade-favicon-16.svg", type: "image/svg+xml" },
+      { url: "/icons/handmade-favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      {
+        url: "/icons/handmade-favicon-192.svg",
+        sizes: "192x192",
+        type: "image/svg+xml",
+      },
+    ],
   },
 };
 
@@ -88,6 +98,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        <link
+          rel="icon"
+          href="/icons/handmade-favicon-16.svg"
+          type="image/svg+xml"
+        />
+        <link rel="alternate icon" href="/icons/handmade-favicon.svg" />
+      </head>
       <Providers>
         <body
           className={cn(

@@ -1,66 +1,138 @@
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";
-
-import MobileMenu from "./MobileMenu";
-import AuthMenu from "../AuthMenu";
-import { auth } from "@/auth";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
+import { FaCartShopping } from "react-icons/fa6";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
-import CartButton from "../products/CartButton";
-import NavLinks from "./NavLinks";
+import { FaUser } from "react-icons/fa";
+import { useCartStore } from "@/store/useCartStore";
+import AuthMenu from "../AuthMenu";
 
-export default async function Navbar() {
-  const session = await auth();
+export default function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
+
+  // استخدام Zustand للحصول على عدد العناصر في سلة التسوق
+  const totalItems = useCartStore((state) => state.totalItems);
+
+  // إغلاق القائمة عند تغيير المسار
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  const navLinks = [
+    { name: "الرئيسية", href: "/" },
+    { name: "الدورات", href: "/courses" },
+    { name: "قصص النجاح", href: "/success-stories" },
+    { name: "المنتجات", href: "/products" },
+    { name: "من نحن", href: "/about" },
+  ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 border-b border-secondary z-[1000] bg-white shadow-sm w-full">
-      <div className="relative flex">
-        <div className="max-w-screen-2xl mx-auto px-7 h-[90px] flex items-center w-full">
-          <nav className="flex items-center justify-between py-4 w-full relative">
-            {!session && (
-              <div className="">
-                <div className="md:flex items-center gap-3 md:gap-5 hidden text-sm">
-                  <Button
-                    asChild
-                    variant="destructive"
-                    className="rounded-full px-5"
-                  >
-                    <Link href="/sign-up">انشاء حساب الان!</Link>
-                  </Button>
-                  <Button asChild className="rounded-full px-5">
-                    <Link href="/sign-in">تسجيل الدخول</Link>
-                  </Button>
-                  <CartButton />
-                </div>
-                <MobileMenu />
-              </div>
-            )}
-
-            <div className="flex items-center gap-5 w-full">
-              {session && (
-                <div className="md:max-w-[300px] w-full">
-                  <div className="flex items-center gap-4">
-                    <AuthMenu session={session} />
-
-                    <CartButton />
-                  </div>
-                </div>
-              )}
-
-              <NavLinks />
-            </div>
-
+    <header className="fixed top-0 left-0 right-0 z-[1000] bg-primary text-white shadow-sm w-full">
+      <div className="container mx-auto">
+        <nav className="flex items-center justify-between flex-row-reverse h-[80px] px-4">
+          {/* User and Cart Icons (Left side) */}
+          <div className="flex items-center gap-6">
+            {/* User Icon with Dropdown for Auth */}
+            {/* Cart Icon with Counter */}
             <Link
-              href="/"
-              className="flex items-center justify-end md:max-w-[300px] w-full"
+              href="/cart"
+              className="relative p-2 hover:bg-primary-darker rounded-full"
             >
-              {/* <Image src="/img/pp2.png" width={100} height={100} alt="logo" /> */}
-              <h1 className="text-3xl font-bold text-primary">
-                Hand<span className="text-orange-500">Made</span>
+              <FaCartShopping className="h-6 w-6 text-white" />
+              {/* إظهار عدد العناصر فقط إذا كان أكبر من صفر */}
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-primary border border-primary text-xs rounded-full size-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            <AuthMenu session={session} />
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              className="p-2 hover:bg-primary-darker rounded-full"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6 text-white" />
+              ) : (
+                <Menu className="h-6 w-6 text-white" />
+              )}
+            </Button>
+          </div>
+
+          {/* Navigation Links (Center) - Desktop */}
+          <div className="hidden md:flex items-center justify-center flex-1">
+            <ul className="flex gap-8">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={cn(
+                      "text-white hover:text-secondary-lighter transition-colors duration-300 py-2 border-b-2 border-transparent",
+                      (pathname === link.href ||
+                        pathname.startsWith(`${link.href}/`)) &&
+                        "border-b-2 border-white font-medium"
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Logo (Right side) */}
+          <div>
+            <Link href="/" className="flex items-center">
+              <h1 className="text-3xl font-bold">
+                Hand <span className="font-light">Made</span>
               </h1>
             </Link>
-          </nav>
-        </div>
+          </div>
+        </nav>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-primary-darker py-4 px-4 animate-in fade-in duration-300">
+          <ul className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={cn(
+                    "text-white hover:text-secondary-lighter transition-colors duration-300 py-2 block",
+                    pathname === link.href &&
+                      "font-medium text-secondary-lighter"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </header>
   );
 }

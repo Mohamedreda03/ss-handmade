@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Loading from "@/components/Loading";
 import { Product } from "@prisma/client";
 import { useQuery } from "react-query";
@@ -26,48 +26,84 @@ export default function ProductsPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products", filters, currentPage],
-    queryFn: async () => {
+  // Debounce search input to avoid too many requests
+  const [searchInput, setSearchInput] = useState("");
+
+  // React Query hook for fetching products
+  const {
+    data: products,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery(
+    ["products", filters, currentPage],
+    async () => {
       const params = new URLSearchParams();
       if (filters.search) params.append("search", filters.search);
       params.append("sort", filters.sortBy);
-      if (filters.productType)
+      if (filters.productType !== "all")
         params.append("productType", filters.productType);
       params.append("page", currentPage.toString());
 
-      // Replace with your actual API endpoint
       const response = await fetch(`/api/products?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+      }
+
       const data = await response.json();
 
-      setTotalPages(data.totalPages);
-      return data.data;
+      // Set total pages from response
+      setTotalPages(data.totalPages || 1);
+
+      return data.data || [];
     },
-  });
+    {
+      keepPreviousData: true, // Keep old data while fetching new data
+      refetchOnWindowFocus: false, // Don't refetch on window focus
+      retry: 1, // Retry once on failure
+      onError: (error) => {
+        console.error("Error fetching products:", error);
+      },
+    }
+  );
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput }));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setFilters((prev: Filters) => ({ ...prev, search: e.target.value }));
-    setCurrentPage(1); // Reset to first page on new search
+    setSearchInput(e.target.value);
   };
 
-  interface Filters {
-    search: string;
-    sortBy: string;
-    productType: string;
-  }
-
   const handleSortChange = (value: string) => {
-    setFilters((prev: Filters) => ({ ...prev, sortBy: value }));
+    setFilters((prev) => ({ ...prev, sortBy: value }));
     setCurrentPage(1); // Reset to first page on sort change
   };
 
   const handleProductTypeChange = (value: string) => {
-    setFilters((prev: Filters) => ({ ...prev, productType: value }));
+    setFilters((prev) => ({ ...prev, productType: value }));
     setCurrentPage(1); // Reset to first page on product type change
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top when changing page
+  };
+
+  const resetFilters = () => {
+    setSearchInput("");
+    setFilters({
+      search: "",
+      sortBy: "newest",
+      productType: "all",
+    });
+    setCurrentPage(1);
   };
 
   // Generate page numbers for pagination
@@ -128,24 +164,37 @@ export default function ProductsPage() {
     <div className="container mx-auto py-8 px-4 md:px-6">
       {/* Filter Section */}
       <div className="bg-card rounded-lg shadow p-4 mb-8">
-        <h2 className="text-xl font-bold mb-4">تصفية المنتجات</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">تصفية المنتجات</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <Input
               placeholder="ابحث عن منتج..."
-              value={filters.search}
+              value={searchInput}
               onChange={handleSearchChange}
               className="pl-10 rtl:pr-10 rtl:pl-4"
+              disabled={isLoading}
             />
-            <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5 h-5 w-5 text-muted-foreground" />
+            <div className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5">
+              {isFetching && filters.search ? (
+                <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
+              ) : (
+                <Search className="h-5 w-5 text-muted-foreground" />
+              )}
+            </div>
           </div>
 
           <Select
             value={filters.productType}
             onValueChange={handleProductTypeChange}
+            disabled={isLoading}
           >
             <SelectTrigger>
               <SelectValue placeholder="نوع المنتج" />
+              {isFetching && filters.productType !== "all" && (
+                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+              )}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">كل المنتجات</SelectItem>
@@ -154,9 +203,14 @@ export default function ProductsPage() {
             </SelectContent>
           </Select>
 
-          <Select value={filters.sortBy} onValueChange={handleSortChange}>
+          <Select
+            value={filters.sortBy}
+            onValueChange={handleSortChange}
+            disabled={isLoading}
+          >
             <SelectTrigger>
               <SelectValue placeholder="الترتيب حسب" />
+              {isFetching && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">الأحدث</SelectItem>
@@ -168,16 +222,34 @@ export default function ProductsPage() {
 
       {isLoading ? (
         <Loading className="h-[500px] flex items-center justify-center" />
+      ) : isFetching ? (
+        <div className="relative h-[500px]">
+          <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
+            <div className="bg-card p-6 rounded-lg shadow-lg flex flex-col items-center">
+              <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+              <p className="text-lg font-medium">جاري تحميل المنتجات...</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8 opacity-30">
+            {products?.map((product: Product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
       ) : products?.length === 0 ? (
         <div className="text-center py-12 min-h-[600px] flex flex-col items-center justify-center">
           <h3 className="text-xl font-medium">مفيش منتجات حاليا</h3>
           <p className="text-muted-foreground mt-2">
-            لا توجد منتجات متاحة حاليا. يرجى التحقق مرة أخرى لاحقًا.
+            لا توجد منتجات متاحة حاليا. يرجى التحقق مرة أخرى لاحقًا أو تغيير
+            معايير البحث.
           </p>
+          <Button className="mt-4" onClick={resetFilters}>
+            إعادة ضبط الفلاتر
+          </Button>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {products?.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -190,7 +262,7 @@ export default function ProductsPage() {
                 variant="outline"
                 size="icon"
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || isFetching}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -206,6 +278,7 @@ export default function ProductsPage() {
                         : ""
                     } w-9`}
                     onClick={() => handlePageChange(page)}
+                    disabled={isFetching}
                   >
                     {page}
                   </Button>
@@ -222,7 +295,7 @@ export default function ProductsPage() {
                 onClick={() =>
                   handlePageChange(Math.min(totalPages, currentPage + 1))
                 }
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || isFetching}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>

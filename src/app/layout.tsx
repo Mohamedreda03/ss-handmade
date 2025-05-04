@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "react-hot-toast";
+import { Toaster as ReactHotToaster } from "react-hot-toast";
 import NextTopLoader from "nextjs-toploader";
 import Providers from "@/components/Providers";
-import AuthChecker from "@/components/AuthChecker";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Toaster as SonnerToaster } from "sonner";
+import { NextAuthProvider } from "@/components/Providers/NextAuthProvider";
+
+import { El_Messiri } from "next/font/google";
+
+const elMessiri = El_Messiri({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-el-messiri",
+});
 
 const dgagnadeen = localFont({
   src: [
@@ -92,8 +101,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster />
-            {children}
+            <ReactHotToaster />
+            <NextAuthProvider>
+              {children}
+              <SonnerToaster position="top-center" />
+            </NextAuthProvider>
             <ShadcnToaster />
           </ThemeProvider>
         </body>

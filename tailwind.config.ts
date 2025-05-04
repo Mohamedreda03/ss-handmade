@@ -34,17 +34,18 @@ const config = {
           "accordion-up": "accordion-up 0.2s ease-out",
         },
         // third: "#f43f5e",
+        "primary-darker": "#3D402C",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: "#F4F4F0",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#E8E4DA",
           foreground: "hsl(var(--secondary-foreground))",
         },
 

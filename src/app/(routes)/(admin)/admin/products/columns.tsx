@@ -25,20 +25,24 @@ export type Product = {
 export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "imageUrl",
-    header: "Image",
+    header: () => <div className="text-center w-full">Image</div>,
     cell: ({ row }) => {
       const imageUrl = row.original.imageUrl;
-      return imageUrl ? (
-        <div className="relative h-10 w-10">
-          <Image
-            src={imageUrl}
-            alt={row.original.name}
-            fill
-            className="rounded-md object-cover"
-          />
+      return (
+        <div className="flex justify-center">
+          {imageUrl ? (
+            <div className="relative h-10 w-10">
+              <Image
+                src={imageUrl}
+                alt={row.original.name}
+                fill
+                className="rounded-md object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-10 w-10 bg-slate-100 rounded-md" />
+          )}
         </div>
-      ) : (
-        <div className="h-10 w-10 bg-slate-100 rounded-md" />
       );
     },
   },
@@ -49,11 +53,15 @@ export const columns: ColumnDef<Product>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full flex justify-start px-0 font-medium"
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      return <div className="font-medium">{row.getValue("name")}</div>;
     },
   },
   {
@@ -63,6 +71,7 @@ export const columns: ColumnDef<Product>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full flex justify-start px-0 font-medium"
         >
           Price
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -76,14 +85,14 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "stock",
-    header: "Stock",
+    header: () => <div className="w-full text-left font-medium">Stock</div>,
     cell: ({ row }) => {
       return <div className="font-medium">{row.original.stock}</div>;
     },
   },
   {
     accessorKey: "isAvailable",
-    header: "Status",
+    header: () => <div className="w-full text-left font-medium">Status</div>,
     cell: ({ row }) => {
       const isAvailable = row.original.isAvailable;
       return (
@@ -95,6 +104,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     id: "actions",
+    header: () => <div className="w-full text-center font-medium">Actions</div>,
     cell: function CellComponent({ row }) {
       const router = useRouter();
       const product = row.original;
@@ -110,7 +120,7 @@ export const columns: ColumnDef<Product>[] = [
       };
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <Button
             variant="outline"
             size="sm"

@@ -8,6 +8,12 @@ const nextConfig = {
         port: "",
         pathname: "/storage/v1/object/public/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
   // إضافة تكوين للويب باك لدعم ملفات الخطوط بشكل أفضل

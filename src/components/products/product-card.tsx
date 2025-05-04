@@ -2,22 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@prisma/client";
+import { Product, Role } from "@prisma/client";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingCart } from "lucide-react";
+import { toast } from "sonner";
+import { FaCartShopping } from "react-icons/fa6";
+import { motion } from "framer-motion";
+
+interface ProductWithCreator extends Product {
+  User?: {
+    id: string;
+    name?: string | null;
+    role: Role;
+  } | null;
+}
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductWithCreator;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
@@ -27,74 +28,92 @@ const ProductCard = ({ product }: ProductCardProps) => {
     addItem({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       quantity: 1,
       imageUrl: product.imageUrl || undefined,
     });
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
+    toast.success("تمت الإضافة للسلة", {
+      description: `تمت إضافة ${product.name} إلى سلة التسوق`,
+      action: {
+        label: "عرض السلة",
+        onClick: () => (window.location.href = "/cart"),
+      },
     });
   };
 
-  // Check if product is new (less than 14 days old)
-  const isNew = product.createdAt
-    ? new Date().getTime() - new Date(product.createdAt).getTime() <
-      14 * 24 * 60 * 60 * 1000
-    : false;
-
   return (
-    <Card className="overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg border border-gray-200 hover:border-primary/50 group">
-      <div className="aspect-square relative bg-gray-50 overflow-hidden">
-        {product.imageUrl ? (
-          <>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-[12px] overflow-hidden shadow-sm group relative p-8 hover:shadow-md transition-shadow"
+    >
+      <Link href={`/products/${product.id}`} className="block relative">
+        <div className="relative h-[220px] w-full overflow-hidden mb-6">
+          {product.imageUrl ? (
             <Image
               src={product.imageUrl}
               alt={product.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover rounded-[6px] group-hover:scale-105 transition-transform duration-300"
             />
-            {isNew && (
-              <Badge className="absolute top-2 right-2 bg-primary text-white">
-                New
-              </Badge>
-            )}
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100">
-            No image
+          ) : (
+            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-500">
+              صورة غير متوفرة
+            </div>
+          )}
+        </div>
+      </Link>
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-2xl font-medium text-right flex-grow ml-2">
+            {product.name}
+          </h3>
+
+          <div className="text-[#888C69] text-2xl font-medium">
+            {product.price} جنيه
           </div>
+        </div>
+        {product.User ? (
+          product.User.role === Role.STUDENT ? (
+            <Image
+              src="/images/student.svg"
+              alt={product.User?.name || ""}
+              width={80}
+              height={80}
+              className="rounded-full"
+            />
+          ) : (
+            <Image
+              src="/images/platform.svg"
+              alt={product.User?.name || ""}
+              width={80}
+              height={80}
+              className="rounded-full"
+            />
+          )
+        ) : (
+          <Image
+            src="/images/platform.svg"
+            alt="منصة"
+            width={80}
+            height={80}
+            className="rounded-full"
+          />
         )}
       </div>
-
-      <CardHeader className="p-4 pb-2">
-        <Link
-          href={`/products/${product.id}`}
-          className="hover:text-primary transition-colors"
-        >
-          <CardTitle className="text-lg line-clamp-1">{product.name}</CardTitle>
-        </Link>
-      </CardHeader>
-
-      <CardContent className="p-4 pt-0 flex-grow">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {product.description || "No description available"}
-        </p>
-      </CardContent>
-
-      <CardFooter className="p-4 pt-2 flex items-center justify-between border-t border-gray-100">
-        <div className="font-bold text-lg">EGP {product.price.toFixed(2)}</div>
+      <motion.div whileTap={{ scale: 0.95 }} className="mt-2">
         <Button
           onClick={handleAddToCart}
-          size="sm"
-          className="transition-all hover:scale-105 rounded-full px-4 flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:shadow-md"
-          variant="default"
+          className="bg-primary text-white hover:opacity-90 transition-colors w-full h-12 text-lg gap-2"
+          size="lg"
         >
-          <ShoppingCart className="w-4 h-4" /> Add to Cart
+          <span>أضف إلى السلة</span>
+          <FaCartShopping className="size-6 text-white" />
         </Button>
-      </CardFooter>
-    </Card>
+      </motion.div>
+    </motion.div>
   );
 };
 

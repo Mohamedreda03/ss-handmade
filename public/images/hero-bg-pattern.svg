@@ -1,0 +1,23 @@
+<svg width="1000" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="pattern1" patternUnits="userSpaceOnUse" width="100" height="100">
+      <circle cx="50" cy="50" r="25" fill="#6F7354" opacity="0.05" />
+    </pattern>
+    <pattern id="pattern2" patternUnits="userSpaceOnUse" width="80" height="80">
+      <rect x="20" y="20" width="40" height="40" rx="10" fill="#888C69" opacity="0.08" />
+    </pattern>
+    <pattern id="pattern3" patternUnits="userSpaceOnUse" width="120" height="120">
+      <path d="M60,20 L100,60 L60,100 L20,60 Z" fill="#3D402C" opacity="0.06" />
+    </pattern>
+  </defs>
+  
+  <rect width="100%" height="100%" fill="#F4F4F0" />
+  <rect width="100%" height="100%" fill="url(#pattern1)" />
+  <rect width="100%" height="100%" fill="url(#pattern2)" />
+  <rect width="100%" height="100%" fill="url(#pattern3)" />
+  
+  <g opacity="0.15">
+    <path d="M0,100 C150,50 250,150 400,50 C550,0 700,100 1000,50 L1000,600 L0,600 Z" fill="#6F7354" />
+    <path d="M0,200 C200,150 400,250 600,150 C800,100 900,200 1000,150 L1000,600 L0,600 Z" fill="#BEB4DA" />
+  </g>
+</svg> 

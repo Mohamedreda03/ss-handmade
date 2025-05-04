@@ -1,87 +1,92 @@
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { ProductType } from "@prisma/client";
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search");
+    const url = new URL(request.url);
+    const search = url.searchParams.get("search") || "";
+    const sort = url.searchParams.get("sort") || "newest";
+    const productType = url.searchParams.get("productType") || "all";
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const pageSize = 12; // Number of products per page
 
-    const limit = 15;
-    const page = searchParams.get("page")
-      ? parseInt(searchParams.get("page") as string)
-      : 1;
-    const skip = (page - 1) * limit;
-
-    const sort = searchParams.get("sort") || "newest";
-
-    const productType = searchParams.get("productType") || "all";
-
-    let orderBy: any = {};
-    if (sort === "newest") {
-      orderBy = { createdAt: "desc" };
-    } else if (sort === "oldest") {
-      orderBy = { createdAt: "asc" };
-    }
-
-    let where: any = {
-      type: productType === "all" ? undefined : productType,
+    // Build where clause based on filters
+    const whereClause: any = {
+      isAvailable: true,
     };
 
-    const products = await prisma.product.findMany({
-      where: {
-        name: {
-          startsWith: search || undefined,
+    // Add search filter
+    if (search) {
+      whereClause.OR = [
+        {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
         },
-        isAvailable: true,
-        ...where,
-      },
-
-      take: limit,
-      skip: skip,
-      orderBy,
-    });
-
-    const totalProducts = await prisma.product.count({
-      where: {
-        name: {
-          startsWith: search || undefined,
+        {
+          description: {
+            contains: search,
+            mode: "insensitive",
+          },
         },
-        isAvailable: true,
-      },
-    });
-
-    return NextResponse.json({
-      data: products,
-      totalPages: Math.ceil(totalProducts / limit),
-      currentPage: page,
-    });
-  } catch (error) {
-    console.error("[PRODUCTS_GET]", error);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const data = await req.json();
-    const session = await auth();
-
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      ];
     }
 
-    const product = await prisma.product.create({
-      data: {
-        ...data,
-        userId: session.user.id,
-        type: "HANDMADE",
-      },
-    });
+    // Add product type filter
+    if (productType !== "all") {
+      whereClause.type = productType as ProductType;
+    }
 
-    return NextResponse.json(product);
+    // Determine order based on sort parameter
+    const orderBy: any = {};
+    if (sort === "newest") {
+      orderBy.createdAt = "desc";
+    } else if (sort === "oldest") {
+      orderBy.createdAt = "asc";
+    }
+
+    // Run both queries in parallel for better performance
+    const [totalItems, products] = await Promise.all([
+      prisma.product.count({
+        where: whereClause,
+      }),
+      prisma.product.findMany({
+        orderBy,
+        include: {
+          User: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+            },
+          },
+        },
+        where: whereClause,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    return NextResponse.json(
+      {
+        data: products,
+        totalPages,
+        currentPage: page,
+        totalItems,
+      },
+      { headers: { "Cache-Control": "private, max-age=10" } }
+    );
   } catch (error) {
-    console.error("[PRODUCTS_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json(
+      {
+        error: "فشل في جلب المنتجات",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }

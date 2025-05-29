@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 import {
   FaFacebook,
   FaTwitter,
@@ -17,9 +18,15 @@ export default function Footer() {
       <div className="container mx-auto px-4 md:px-6">
         {/* Main footer content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-10">
+          {" "}
           {/* Logo and social icons */}
           <div className="flex flex-col mb-8">
-            <h2 className="text-3xl font-bold mb-1">Hand Made</h2>
+            <Image
+              src="/logo.png"
+              alt="Handmade Logo"
+              width={150}
+              height={50}
+            />
             <p className="text-sm mb-3 opacity-90">
               إبداع تركي وحرفية تكمل الحكاية
             </p>
@@ -56,7 +63,6 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-
           {/* الدعم */}
           <div className="text-right order-3 md:order-2">
             <h3 className="text-xl font-bold mb-5">الدعم</h3>
@@ -86,7 +92,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
           {/* الشركة */}
           <div className="text-right order-2 md:order-3">
             <h3 className="text-xl font-bold mb-5">الشركة</h3>
@@ -113,7 +118,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
           {/* المنتجات */}
           <div className="text-right order-1 md:order-4">
             <h3 className="text-xl font-bold mb-5">المنتجات</h3>
@@ -138,7 +142,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
           {/* معلومات التواصل */}
           <div className="text-right order-1 md:order-5">
             <h3 className="text-xl font-bold mb-5">معلومات التواصل</h3>

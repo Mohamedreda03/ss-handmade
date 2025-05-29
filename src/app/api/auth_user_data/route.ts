@@ -15,6 +15,14 @@ export async function GET(req: NextRequest) {
       where: {
         id: session.user.id,
       },
+      include: {
+        accounts: {
+          select: {
+            provider: true,
+            type: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ user });

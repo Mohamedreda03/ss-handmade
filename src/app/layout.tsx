@@ -78,14 +78,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/handmade-favicon-16.svg", type: "image/svg+xml" },
-      { url: "/icons/handmade-favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+      { url: "/logo.png", type: "image/png" },
     ],
     apple: [
       {
-        url: "/icons/handmade-favicon-192.svg",
+        url: "/logo.png",
         sizes: "192x192",
-        type: "image/svg+xml",
+        type: "image/png",
       },
     ],
   },

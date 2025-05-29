@@ -83,6 +83,10 @@ export default {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
+        console.log("JWT callback - New login:", {
+          provider: account?.provider,
+          email: user.email,
+        });
         // For Google authentication
         if (account && account.provider === "google") {
           // Check if user exists in the database
@@ -91,8 +95,8 @@ export default {
               email: user.email!,
             },
           });
-
           if (!existingUser) {
+            console.log("Creating new Google user");
             // Create a new user if they don't exist
             const newUser = await prisma.user.create({
               data: {
@@ -120,7 +124,14 @@ export default {
               device_id: deviceId,
             };
           } else {
-            // User exists, create session
+            console.log("Existing Google user, creating new session");
+            // User exists, delete old sessions and create new one
+            await prisma.session.deleteMany({
+              where: {
+                userId: existingUser.id,
+              },
+            });
+
             const deviceId = uuidv4();
 
             await prisma.session.create({
@@ -140,6 +151,7 @@ export default {
             };
           }
         } else {
+          console.log("Credentials login");
           // Regular credentials login
           const userData = await prisma.user.findUnique({
             where: {

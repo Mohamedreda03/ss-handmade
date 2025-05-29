@@ -19,6 +19,7 @@ import { Button } from "../ui/button";
 import { FaUser } from "react-icons/fa";
 import { useCartStore } from "@/store/useCartStore";
 import AuthMenu from "../AuthMenu";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,7 +63,6 @@ export default function Navbar() {
               )}
             </Link>
           </div>
-
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button
@@ -77,7 +77,6 @@ export default function Navbar() {
               )}
             </Button>
           </div>
-
           {/* Navigation Links (Center) - Desktop */}
           <div className="hidden md:flex items-center justify-center flex-1">
             <ul className="flex gap-8">
@@ -97,14 +96,17 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-          </div>
-
+          </div>{" "}
           {/* Logo (Right side) */}
           <div>
             <Link href="/" className="flex items-center">
-              <h1 className="text-3xl font-bold">
-                Hand <span className="font-light">Made</span>
-              </h1>
+              <Image
+                src="/logo.png"
+                alt="Handmade Logo"
+                width={120}
+                height={50}
+                priority
+              />
             </Link>
           </div>
         </nav>

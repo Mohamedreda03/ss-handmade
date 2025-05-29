@@ -3,16 +3,15 @@ import DashboardMenu from "@/components/student_dashboard/DashboardMenu";
 import DashboardHead from "@/components/student_dashboard/DashboardHead";
 import { redirect } from "next/navigation";
 import React from "react";
-import { isAuth } from "@/actions/isAuth";
 
 export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isUserAuth = await isAuth();
+  const session = await auth();
 
-  if (!isUserAuth) {
+  if (!session) {
     redirect("/");
   }
 

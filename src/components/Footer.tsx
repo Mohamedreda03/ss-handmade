@@ -163,14 +163,6 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-
-        {/* Divider line */}
-        <div className="border-t border-white/20 my-6"></div>
-
-        {/* Copyright */}
-        <div className="text-center text-sm opacity-90">
-          <p>حقوق النشر © 2025 جميع الحقوق محفوظة</p>
-        </div>
       </div>
     </footer>
   );

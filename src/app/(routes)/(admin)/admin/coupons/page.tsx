@@ -105,7 +105,7 @@ export default function Coupons() {
             <TableRow>
               <TableHead className="text-center">الكوبون</TableHead>
               <TableHead className="text-center">قيمة الكوبون</TableHead>
-              <TableHead className="text-center">الحلة</TableHead>
+              <TableHead className="text-center">الحالة</TableHead>
               <TableHead className="text-center"></TableHead>
             </TableRow>
           </TableHeader>

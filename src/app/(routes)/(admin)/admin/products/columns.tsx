@@ -25,7 +25,7 @@ export type Product = {
 export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "imageUrl",
-    header: () => <div className="text-center w-full">Image</div>,
+    header: () => <div className="text-center w-full">الصورة</div>,
     cell: ({ row }) => {
       const imageUrl = row.original.imageUrl;
       return (
@@ -55,7 +55,7 @@ export const columns: ColumnDef<Product>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="w-full flex justify-start px-0 font-medium"
         >
-          Name
+          الاسم
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -73,7 +73,7 @@ export const columns: ColumnDef<Product>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="w-full flex justify-start px-0 font-medium"
         >
-          Price
+          السعر
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -85,26 +85,28 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "stock",
-    header: () => <div className="w-full text-left font-medium">Stock</div>,
+    header: () => <div className="w-full text-left font-medium">المخزون</div>,
     cell: ({ row }) => {
       return <div className="font-medium">{row.original.stock}</div>;
     },
   },
   {
     accessorKey: "isAvailable",
-    header: () => <div className="w-full text-left font-medium">Status</div>,
+    header: () => <div className="w-full text-left font-medium">الحالة</div>,
     cell: ({ row }) => {
       const isAvailable = row.original.isAvailable;
       return (
         <Badge variant={isAvailable ? "success" : "destructive"}>
-          {isAvailable ? "Available" : "Unavailable"}
+          {isAvailable ? "متاح" : "غير متاح"}
         </Badge>
       );
     },
   },
   {
     id: "actions",
-    header: () => <div className="w-full text-center font-medium">Actions</div>,
+    header: () => (
+      <div className="w-full text-center font-medium">الإجراءات</div>
+    ),
     cell: function CellComponent({ row }) {
       const router = useRouter();
       const product = row.original;
@@ -112,10 +114,10 @@ export const columns: ColumnDef<Product>[] = [
       const handleDelete = async () => {
         try {
           await axios.delete(`/api/admin/products/${product.id}`);
-          toast.success("Product deleted");
+          toast.success("تم حذف المنتج");
           router.refresh();
         } catch (error) {
-          toast.error("Something went wrong");
+          toast.error("حدث خطأ ما");
         }
       };
 

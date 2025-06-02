@@ -117,13 +117,13 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No data available
+                  لا توجد بيانات متاحة
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-      </div>
+      </div>{" "}
       <div className="flex items-center gap-2 space-x-2 py-4">
         <Button
           variant="outline"
@@ -131,7 +131,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          التالي
         </Button>
         <Button
           variant="outline"
@@ -139,7 +139,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          السابق
         </Button>
       </div>
     </div>

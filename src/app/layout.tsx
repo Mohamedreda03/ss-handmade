@@ -62,11 +62,11 @@ const dgagnadeen = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "handmade - منصة الحرف اليدوية",
+  title: "crafteria",
   description: "منصة تعليمية متخصصة في الحرف اليدوية وبيع المنتجات الحرفية",
   keywords: "حرف يدوية، دورات، منتجات، تعليم، صناعة يدوية، حرفيين، handmade",
   openGraph: {
-    title: "handmade - منصة الحرف اليدوية",
+    title: "crafteria",
     description: "منصة تعليمية متخصصة في الحرف اليدوية وبيع المنتجات الحرفية",
     url: "",
     images: [

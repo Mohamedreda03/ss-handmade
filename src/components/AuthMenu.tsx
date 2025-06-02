@@ -79,7 +79,7 @@ export default function AuthMenu({ session }: { session: any }) {
                   }
                 >
                   <LayoutDashboard className="ml-2 h-4 w-4" />
-                  <span>لوحت التحكم</span>
+                  <span>لوحة التحكم</span>
                 </Link>
               </DropdownMenuItem>
             )}

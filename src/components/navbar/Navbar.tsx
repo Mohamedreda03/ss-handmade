@@ -45,24 +45,22 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[1000] bg-primary text-white shadow-sm w-full">
+      {" "}
       <div className="container mx-auto">
         <nav className="flex items-center justify-between flex-row h-[80px] px-4">
-          {/* User and Cart Icons (Left side) */}
-          <div className="flex items-center gap-6">
-            <AuthMenu session={session} />
-            <Link
-              href="/cart"
-              className="relative p-2 hover:bg-primary-darker rounded-full"
-            >
-              <FaCartShopping className="h-6 w-6 text-white" />
-              {/* إظهار عدد العناصر فقط إذا كان أكبر من صفر */}
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-primary border border-primary text-xs rounded-full size-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
+          {/* Logo (Right side) */}
+          <div>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.png"
+                alt="Handmade Logo"
+                width={120}
+                height={50}
+                priority
+              />
             </Link>
           </div>
+
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button
@@ -77,6 +75,7 @@ export default function Navbar() {
               )}
             </Button>
           </div>
+
           {/* Navigation Links (Center) - Desktop */}
           <div className="hidden md:flex items-center justify-center flex-1">
             <ul className="flex gap-8">
@@ -96,22 +95,26 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-          </div>{" "}
-          {/* Logo (Right side) */}
-          <div>
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/logo.png"
-                alt="Handmade Logo"
-                width={120}
-                height={50}
-                priority
-              />
+          </div>
+
+          {/* User and Cart Icons (Left side) */}
+          <div className="flex items-center gap-6">
+            <Link
+              href="/cart"
+              className="relative p-2 hover:bg-primary-darker rounded-full"
+            >
+              <FaCartShopping className="h-6 w-6 text-white" />
+              {/* إظهار عدد العناصر فقط إذا كان أكبر من صفر */}
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-primary border border-primary text-xs rounded-full size-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </Link>
+            <AuthMenu session={session} />
           </div>
         </nav>
       </div>
-
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-primary-darker py-4 px-4 animate-in fade-in duration-300">

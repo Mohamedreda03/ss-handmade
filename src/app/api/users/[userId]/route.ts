@@ -20,20 +20,27 @@ export async function PATCH(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    body.password =
-      body.password.length > 0
-        ? await bcrypt.hash(body.password, 10)
-        : undefined;
+    // إعداد البيانات المحدثة
+    const updateData: any = {};
 
-    body.owned_money = body.owned_money.toString();
+    // تحديث كلمة المرور فقط إذا تم إدخالها
+    if (body.password && body.password.trim().length > 0) {
+      updateData.password = await bcrypt.hash(body.password, 10);
+    }
+
+    // تحديث الصلاحية
+    if (body.role) {
+      updateData.role = body.role;
+    }
+
+    // إزالة الحقول التي لا نريد تحديثها
+    delete body.password;
 
     const user = await prisma.user.update({
       where: {
         id: params.userId as string,
       },
-      data: {
-        ...body,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({
@@ -41,7 +48,7 @@ export async function PATCH(
       success: true,
     });
   } catch (error) {
-    console.log("GET USERS [userId] DATA:", error);
+    console.log("UPDATE USER ERROR:", error);
     return new NextResponse("internal server error", { status: 500 });
   }
 }

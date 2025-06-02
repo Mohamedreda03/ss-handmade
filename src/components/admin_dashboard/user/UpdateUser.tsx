@@ -41,9 +41,9 @@ interface UpdateUserRoleProps {
 }
 
 const roles = [
-  { value: "STUDENT", label: "student" },
-  { value: "CONSTRUCTOR", label: "constructor" },
-  { value: "ADMIN", label: "admin" },
+  { value: "STUDENT", label: "طالب" },
+  { value: "CONSTRUCTOR", label: "مدرب" },
+  { value: "ADMIN", label: "مدير" },
 ];
 
 export default function UpdateUser({ user }: UpdateUserRoleProps) {
@@ -56,35 +56,43 @@ export default function UpdateUser({ user }: UpdateUserRoleProps) {
       password: "",
     },
   });
-
   const {
     mutateAsync: updateUserData,
     isLoading,
     isSuccess,
   } = useMutation({
     mutationFn: async (data: z.infer<typeof FormSchema>) => {
-      await axios.patch(`/api/users/${user?.id}`, data);
+      const response = await axios.patch(`/api/users/${user?.id}`, data);
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["users"]);
+      queryClient.invalidateQueries(["users", user?.id]);
 
       toast({
         description: (
           <div className="flex items-center gap-3">
             <BadgeCheck size={18} className="mr-2 text-green-500" />
-            <span>تم تحديث البيانات.</span>
+            <span>تم تحديث البيانات بنجاح.</span>
           </div>
         ),
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("خطأ في تحديث المستخدم:", error);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        "حدث خطأ ما، الرجاء المحاولة مرة أخرى.";
+
       toast({
         description: (
           <div className="flex items-center gap-3">
             <BadgeInfo size={18} className="mr-2 text-red-500" />
-            <span>حدث خطأ ما، الرجاء المحاولة مرة اخرى.</span>
+            <span>{errorMessage}</span>
           </div>
         ),
+        variant: "destructive",
       });
     },
   });
@@ -103,68 +111,83 @@ export default function UpdateUser({ user }: UpdateUserRoleProps) {
       password: "",
     });
   }, [isSuccess, form, user?.role]);
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="grid gap-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>تعديل كلمة المرور</FormLabel>
-                <Input
-                  disabled={isLoading}
-                  {...field}
-                  type="text"
-                  placeholder="أدخل كلمة المرور الجديدة"
-                  dir="rtl"
-                />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="bg-card rounded-lg border p-6">
+          <h3 className="text-lg font-semibold mb-4 text-primary">
+            تحديث بيانات المستخدم
+          </h3>
 
-                <FormMessage />
-              </FormItem>
+          <div className="grid gap-5 lg:grid-cols-2 grid-cols-1">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>كلمة المرور الجديدة (اختياري)</FormLabel>
+                  <Input
+                    disabled={isLoading}
+                    {...field}
+                    type="password"
+                    placeholder="اتركه فارغاً إذا لم تريد تغيير كلمة المرور"
+                    dir="rtl"
+                    className="text-right"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    * اتركه فارغاً إذا لم تريد تغيير كلمة المرور
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>صلاحية المستخدم</FormLabel>
+                  <Select
+                    disabled={isLoading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    dir="rtl"
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الصلاحية" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="mt-6 max-w-[250px] w-full text-lg h-12"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                جاري الحفظ...
+              </div>
+            ) : (
+              "حفظ التغييرات"
             )}
-          />
-
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>صلاحيت المستخدم</FormLabel>
-                <Select
-                  disabled={isLoading}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  dir="rtl"
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          </Button>
         </div>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="mt-5 max-w-[250px] w-full text-lg h-12"
-        >
-          {isLoading ? "جاري حفظ..." : "حفظ"}
-        </Button>
       </form>
     </Form>
   );

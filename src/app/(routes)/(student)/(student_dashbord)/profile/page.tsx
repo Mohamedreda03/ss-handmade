@@ -203,7 +203,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardContent>
-        </Card>{" "}        {/* تغيير كلمة المرور - يظهر فقط للمستخدمين العاديين أو المستخدمين Google الذين لديهم كلمة مرور */}
+        </Card>{" "}
+        {/* تغيير كلمة المرور - يظهر فقط للمستخدمين العاديين أو المستخدمين Google الذين لديهم كلمة مرور */}
         {shouldShowPasswordSection && (
           <Card className="border-l-4 border-l-primary/50 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
@@ -216,7 +217,7 @@ export default function ProfilePage() {
                 </span>
               </CardTitle>
               <p className="text-sm text-gray-600 dark:text-gray-400 text-right mt-2">
-                {hasPassword 
+                {hasPassword
                   ? "قم بإدخال كلمة مرور جديدة لحسابك (يجب أن تكون أطول من 8 أحرف)"
                   : "قم بإنشاء كلمة مرور لحسابك (يجب أن تكون أطول من 8 أحرف)"}
               </p>
@@ -224,8 +225,8 @@ export default function ProfilePage() {
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <Label 
-                    htmlFor="newPassword" 
+                  <Label
+                    htmlFor="newPassword"
                     className="text-right text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -271,8 +272,8 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label 
-                    htmlFor="confirmPassword" 
+                  <Label
+                    htmlFor="confirmPassword"
                     className="text-right text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -338,7 +339,9 @@ export default function ProfilePage() {
                   </li>
                   <li className="flex items-center justify-end gap-2">
                     <span>يجب أن تتطابق كلمتا المرور</span>
-                    {newPassword && confirmPassword && newPassword === confirmPassword ? (
+                    {newPassword &&
+                    confirmPassword &&
+                    newPassword === confirmPassword ? (
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     ) : (
                       <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>

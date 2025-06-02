@@ -33,70 +33,82 @@ export default function UserDataTableAndUpdate({ userId }: { userId: string }) {
     router.push("/");
     return;
   }
-
   return (
-    <div>
+    <div className="space-y-6">
       <Button className="mb-5" variant="outline" asChild>
         <Link href="/admin/users" className="flex items-center">
           <ArrowRight className="ml-2" size={16} />
           العودة للقائمة
         </Link>
       </Button>
-      <div className="text-2xl flex items-center gap-5 mb-8">
-        <div>بيانات المستخدم</div>
-        <div className="mr-3 border-b border-secondary">
-          {data && data?.user?.name}
+
+      <div className="bg-card rounded-lg border p-6">
+        <div className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+          <div>بيانات المستخدم</div>
+          <div className="text-lg font-normal text-muted-foreground border-r pr-3">
+            {data && data?.user?.name}
+          </div>
         </div>
+
+        {data && (
+          <div className="bg-muted/30 rounded-lg p-4 mb-6">
+            <Table
+              dir="rtl"
+              className="bg-background rounded-lg overflow-hidden"
+            >
+              <TableBody>
+                <TableRow>
+                  <TableCell className="w-[200px] bg-primary/5 font-medium">
+                    ID
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {data?.user?.id}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-[200px] bg-primary/5 font-medium">
+                    اسم المستخدم
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {data?.user?.name}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-[200px] bg-primary/5 font-medium">
+                    البريد الإلكتروني
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {data?.user?.email || "لا يوجد"}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-[200px] bg-primary/5 font-medium">
+                    الصلاحيات
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        data?.user?.role === "ADMIN"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                          : data?.user?.role === "CONSTRUCTOR"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      }`}
+                    >
+                      {data?.user?.role === "ADMIN"
+                        ? "مدير"
+                        : data?.user?.role === "CONSTRUCTOR"
+                        ? "مدرب"
+                        : "طالب"}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
-      {data && (
-        <div>
-          <Table dir="rtl" className="mb-8 border">
-            <TableBody>
-              <TableRow>
-                <TableCell className="w-[200px] bg-slate-100 dark:bg-slate-900">
-                  ID
-                </TableCell>
-                <TableCell className="font-medium">{data?.user?.id}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="w-[200px] bg-slate-100 dark:bg-slate-900">
-                  أسم المستخدم
-                </TableCell>
-                <TableCell className="font-medium">
-                  {data?.user?.name}
-                </TableCell>
-              </TableRow>
 
-              <TableRow>
-                <TableCell className="w-[200px] bg-slate-100 dark:bg-slate-900">
-                  البريد الالكتروني
-                </TableCell>
-                <TableCell className="font-medium">
-                  {data?.user?.email || "لا يوجد"}
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell className="w-[200px] bg-slate-100 dark:bg-slate-900">
-                  الصلاحيات
-                </TableCell>
-                <TableCell className="font-medium">
-                  {data?.user?.role}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="w-[200px] bg-slate-100 dark:bg-slate-900">
-                  المال المملوك
-                </TableCell>
-                <TableCell className="font-medium">
-                  {data?.user?.owned_money}
-                  <span className="mr-2">جنية</span>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      )}
       <UpdateUser user={data && (data?.user as User)} />
     </div>
   );

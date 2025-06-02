@@ -14,153 +14,85 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-primary/90 text-white py-12 w-full">
-      <div className="container mx-auto px-4 md:px-6">
+    <footer className="bg-primary/90 text-white py-20 w-full">
+      {" "}
+      <div className="container mx-auto px-6 md:px-8 max-w-6xl">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-10">
-          {" "}
-          {/* Logo and social icons */}
-          <div className="flex flex-col mb-8">
-            <Image
-              src="/logo.png"
-              alt="Handmade Logo"
-              width={150}
-              height={50}
-            />
-            <p className="text-sm mb-3 opacity-90">
-              إبداع تركي وحرفية تكمل الحكاية
-            </p>
-            <div className="flex gap-4">
-              <Link
-                href="https://facebook.com"
-                className="hover:text-secondary-lighter transition-colors"
-              >
-                <FaFacebook size={18} />
-              </Link>
-              <Link
-                href="https://twitter.com"
-                className="hover:text-secondary-lighter transition-colors"
-              >
-                <FaTwitter size={18} />
-              </Link>
-              <Link
-                href="https://instagram.com"
-                className="hover:text-secondary-lighter transition-colors"
-              >
-                <FaInstagram size={18} />
-              </Link>
-              <Link
-                href="https://linkedin.com"
-                className="hover:text-secondary-lighter transition-colors"
-              >
-                <FaLinkedin size={18} />
-              </Link>
-              <Link
-                href="https://youtube.com"
-                className="hover:text-secondary-lighter transition-colors"
-              >
-                <FaYoutube size={18} />
-              </Link>
+        <div className="flex flex-col items-center justify-center space-y-16">
+          {/* Logo and Contact Information Side by Side */}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24 w-full">
+            {/* Logo and description */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                src="/logo.png"
+                alt="Handmade Logo"
+                width={240}
+                height={80}
+                className="mb-8"
+              />
+              <p className="text-2xl mb-8 opacity-90 max-w-md leading-relaxed font-medium">
+                إبداع حرفي وحرفية تكمل الحكاية
+              </p>
+            </div>
+
+            {/* Contact Information */}
+            <div className="text-center lg:text-right" dir="rtl">
+              <h3 className="text-3xl font-bold mb-10 text-secondary-lighter">
+                معلومات التواصل
+              </h3>
+              <ul className="space-y-8">
+                <li className="flex items-center justify-center lg:justify-start gap-4">
+                  <FaEnvelope className="text-2xl text-secondary-lighter" />
+                  <span className="text-xl font-medium">
+                    contact@Handmade.com
+                  </span>
+                </li>
+                <li className="flex items-center justify-center lg:justify-start gap-4">
+                  <FaPhone className="text-2xl text-secondary-lighter" />
+                  <span className="text-xl font-medium" dir="ltr">
+                    +2010123456
+                  </span>
+                </li>
+                <li className="flex items-center justify-center lg:justify-start gap-4">
+                  <FaMapMarkerAlt className="text-2xl text-secondary-lighter" />
+                  <span className="text-xl font-medium">Egypt, Cairo</span>
+                </li>
+              </ul>
             </div>
           </div>
-          {/* الدعم */}
-          <div className="text-right order-3 md:order-2">
-            <h3 className="text-xl font-bold mb-5">الدعم</h3>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/faq" className="hover:text-secondary-lighter">
-                  كيف نبدأ ؟
-                </Link>
-              </li>
-              <li>
-                <Link href="/help" className="hover:text-secondary-lighter">
-                  مركز المساعدة
-                </Link>
-              </li>
-              <li>
-                <Link href="/report" className="hover:text-secondary-lighter">
-                  بلغ عن مشكلة
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/live-support"
-                  className="hover:text-secondary-lighter"
-                >
-                  محادثة مع فريق الدعم
-                </Link>
-              </li>
-            </ul>
-          </div>
-          {/* الشركة */}
-          <div className="text-right order-2 md:order-3">
-            <h3 className="text-xl font-bold mb-5">الشركة</h3>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/about" className="hover:text-secondary-lighter">
-                  من نحن
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-secondary-lighter">
-                  تواصل معنا
-                </Link>
-              </li>
-              <li>
-                <Link href="/culture" className="hover:text-secondary-lighter">
-                  ثقافتنا
-                </Link>
-              </li>
-              <li>
-                <Link href="/vision" className="hover:text-secondary-lighter">
-                  رؤيتنا
-                </Link>
-              </li>
-            </ul>
-          </div>
-          {/* المنتجات */}
-          <div className="text-right order-1 md:order-4">
-            <h3 className="text-xl font-bold mb-5">المنتجات</h3>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/products" className="hover:text-secondary-lighter">
-                  منتجات المصنع
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products/orders"
-                  className="hover:text-secondary-lighter"
-                >
-                  منتجات الطلب
-                </Link>
-              </li>
-              <li>
-                <Link href="/training" className="hover:text-secondary-lighter">
-                  دورات تدريبية
-                </Link>
-              </li>
-            </ul>
-          </div>
-          {/* معلومات التواصل */}
-          <div className="text-right order-1 md:order-5">
-            <h3 className="text-xl font-bold mb-5">معلومات التواصل</h3>
-            <ul className="space-y-4">
-              <li className="flex items-center justify-end gap-2">
-                <span className="mr-2">contact@Handmade.com</span>
-                <FaEnvelope className="text-lg" />
-              </li>
-              <li className="flex items-center justify-end gap-2">
-                <span className="mr-2" dir="ltr">
-                  +2010123456
-                </span>
-                <FaPhone className="text-lg" />
-              </li>
-              <li className="flex items-center justify-end gap-2">
-                <span className="mr-2">Egypt,Cairo</span>
-                <FaMapMarkerAlt className="text-lg" />
-              </li>
-            </ul>
+
+          {/* Social Media Icons */}
+          <div className="flex justify-center gap-8">
+            <Link
+              href="https://facebook.com"
+              className="hover:text-secondary-lighter transition-all duration-300 p-4 hover:bg-white/10 rounded-full hover:scale-110"
+            >
+              <FaFacebook size={32} />
+            </Link>
+            <Link
+              href="https://twitter.com"
+              className="hover:text-secondary-lighter transition-all duration-300 p-4 hover:bg-white/10 rounded-full hover:scale-110"
+            >
+              <FaTwitter size={32} />
+            </Link>
+            <Link
+              href="https://instagram.com"
+              className="hover:text-secondary-lighter transition-all duration-300 p-4 hover:bg-white/10 rounded-full hover:scale-110"
+            >
+              <FaInstagram size={32} />
+            </Link>
+            <Link
+              href="https://linkedin.com"
+              className="hover:text-secondary-lighter transition-all duration-300 p-4 hover:bg-white/10 rounded-full hover:scale-110"
+            >
+              <FaLinkedin size={32} />
+            </Link>
+            <Link
+              href="https://youtube.com"
+              className="hover:text-secondary-lighter transition-all duration-300 p-4 hover:bg-white/10 rounded-full hover:scale-110"
+            >
+              <FaYoutube size={32} />
+            </Link>
           </div>
         </div>
       </div>

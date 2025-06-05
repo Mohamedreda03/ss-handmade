@@ -7,6 +7,8 @@ import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/ui/button";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailsProps {
   product: Product;
@@ -15,6 +17,8 @@ interface ProductDetailsProps {
 export const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const incrementQuantity = () => {
     if (quantity < product.stock) {
@@ -29,6 +33,16 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
   };
 
   const handleAddToCart = () => {
+    // التحقق من تسجيل الدخول
+    if (!session) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يجب عليك تسجيل الدخول أولاً لإضافة المنتجات إلى السلة",
+        variant: "destructive",
+      });
+      return;
+    }
+
     addItem({
       productId: product.id,
       name: product.name,
@@ -38,8 +52,8 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
     });
 
     toast({
-      title: "Added to cart",
-      description: `${product.name} (${quantity}) has been added to your cart.`,
+      title: "تمت الإضافة إلى السلة",
+      description: `تم إضافة ${product.name} (${quantity}) إلى سلة التسوق الخاصة بك.`,
     });
 
     // Reset quantity after adding to cart

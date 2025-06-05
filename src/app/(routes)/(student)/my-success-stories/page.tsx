@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { Loader2, Plus, Pencil, Trash } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -168,9 +168,25 @@ export default function MySuccessStoriesPage() {
                     <div
                       className={`w-full ${story.imageUrl ? "md:w-3/4" : ""}`}
                     >
+                      {" "}
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold">{story.name}</h3>
                         <Badge className={status.color}>{status.label}</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {story.createdAt
+                            ? new Date(story.createdAt).toLocaleDateString(
+                                "ar-EG",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )
+                            : "تاريخ غير محدد"}
+                        </span>
                       </div>
                       {story.status !== "APPROVED" && (
                         <p className="text-sm text-gray-500 mb-3">
@@ -184,13 +200,11 @@ export default function MySuccessStoriesPage() {
                       <p className="text-gray-600 mb-6 line-clamp-3">
                         {story.story}
                       </p>
-
                       {story.course && (
                         <Badge variant="outline" className="mb-4">
                           {story.course}
                         </Badge>
                       )}
-
                       <div className="flex justify-end gap-2 mt-4">
                         <Link href={`/edit-success-story/${story.id}`}>
                           <Button variant="outline" size="sm">

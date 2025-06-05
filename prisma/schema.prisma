@@ -69,10 +69,12 @@ model User {
   coupon  Coupon[]
 
   // Add relation to accounts for OAuth
-  accounts Account[]
-
+  accounts       Account[]
   // User success stories
   successStories SuccessStory[]
+
+  // Contractor profile
+  contractorProfile ContractorProfile?
 }
 
 enum Gender {
@@ -477,4 +479,40 @@ model SuccessStory {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+}
+
+// نموذج ملف الكونستراكتور
+model ContractorProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // البيانات الأساسية
+  bio            String? @db.Text // نبذة عن الكونستراكتور
+  specialization String? // التخصص
+  experience     String? // سنوات الخبرة
+
+  // الروابط المهنية
+  linkedinUrl  String? // رابط LinkedIn
+  portfolioUrl String? // رابط الموقع الشخصي أو Portfolio
+  // ملف السيرة الذاتية
+  cvUrl        String? // رابط ملف PDF للسيرة الذاتية
+
+  // حالة الموافقة
+  status     ContractorStatus @default(PENDING)
+  reviewedAt DateTime? // تاريخ المراجعة
+
+  // تواريخ
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+enum ContractorStatus {
+  PENDING // في انتظار المراجعة
+  APPROVED // مقبول
+  REJECTED // مرفوض
+  SUSPENDED // معلق
 }

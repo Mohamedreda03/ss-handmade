@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
     const featured = searchParams.get("featured");
     const limitParam = searchParams.get("limit");
     const pageParam = searchParams.get("page");
+    const profession = searchParams.get("profession");
+    const course = searchParams.get("course");
+    const sortBy = searchParams.get("sortBy") || "newest"; // newest, oldest
 
     // تحديد رقم الصفحة الحالية (الافتراضي: 1)
     const page = pageParam ? parseInt(pageParam) : 1;
@@ -32,12 +35,28 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: sortBy === "oldest" ? "asc" : "desc",
       },
     };
 
     if (featured === "true") {
       query.where.isFeature = true;
+    }
+
+    // إضافة فلاتر للمهنة
+    if (profession && profession !== "all") {
+      query.where.profession = {
+        contains: profession,
+        mode: "insensitive",
+      };
+    }
+
+    // إضافة فلاتر للدورة
+    if (course && course !== "all") {
+      query.where.course = {
+        contains: course,
+        mode: "insensitive",
+      };
     }
 
     // إضافة skip و take للتصفح الصفحي

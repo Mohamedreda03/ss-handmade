@@ -2,16 +2,24 @@
 
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon, MinusIcon, PlusIcon, ShoppingBag } from "lucide-react";
+import {
+  Trash2Icon,
+  MinusIcon,
+  PlusIcon,
+  ShoppingBag,
+  LogIn,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 export default function CartPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const { data: session, status } = useSession();
   const {
     items,
     totalItems,
@@ -26,8 +34,37 @@ export default function CartPage() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  if (!mounted || status === "loading") {
     return null;
+  }
+
+  // إذا لم يكن المستخدم مسجل دخول، عرض رسالة تسجيل الدخول
+  if (!session) {
+    return (
+      <div className="container mx-auto py-10 px-4 md:px-6">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">سلة التسوق</h1>
+        </div>
+
+        <div className="text-center py-16 space-y-6">
+          <div className="flex justify-center">
+            <LogIn className="h-20 w-20 text-muted-foreground" />
+          </div>
+          <h2 className="text-2xl font-medium">يجب تسجيل الدخول</h2>
+          <p className="text-muted-foreground">
+            يجب عليك تسجيل الدخول أولاً لعرض سلة التسوق الخاصة بك
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild>
+              <Link href="/sign-in">تسجيل الدخول</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/sign-up">إنشاء حساب جديد</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

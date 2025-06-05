@@ -12,6 +12,7 @@ import {
   Package,
   ShoppingBag,
   Star,
+  HardHat,
 } from "lucide-react";
 
 interface MenuData {
@@ -92,6 +93,13 @@ export const admin_menu_data: MenuData[] = [
     link: `/admin/success-stories`,
     title: "قصص النجاح",
     Icon: Star,
+    role: ["ADMIN"],
+  },
+  {
+    id: 10,
+    link: `/admin/contractors`,
+    title: "الكونستراكتور",
+    Icon: HardHat,
     role: ["ADMIN"],
   },
 ];

@@ -145,11 +145,15 @@ export default function SuccessStoryDetailsPage({
                     />
                   </div>
                   <span>{story.user?.name || "مستخدم"}</span>
-                </div>
+                </div>{" "}
                 <div>
                   <span>تاريخ النشر: </span>
                   <span>
-                    {new Date(story.createdAt).toLocaleDateString("ar-EG")}
+                    {new Date(story.createdAt).toLocaleDateString("ar-EG", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </span>
                 </div>
               </div>

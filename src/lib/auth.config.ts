@@ -50,7 +50,6 @@ export default {
         },
       },
     }),
-
     Credentials({
       async authorize(credentials: any) {
         const { email, password } = credentials;
@@ -58,6 +57,9 @@ export default {
         const user = await prisma.user.findFirst({
           where: {
             email,
+          },
+          include: {
+            contractorProfile: true, // تضمين بيانات ملف الكونستراكتور
           },
         });
 
@@ -69,6 +71,29 @@ export default {
 
         if (!isPasswordValid) {
           return null;
+        } // التحقق من حالة الكونستراكتور إذا كان المستخدم كونستراكتور
+        if (user.role === "CONSTRUCTOR") {
+          if (!user.contractorProfile) {
+            throw new Error("لم يتم العثور على ملف الكونستراكتور الخاص بك");
+          }
+
+          const contractorStatus = user.contractorProfile.status;
+          if (contractorStatus === "PENDING") {
+            throw new Error("حسابك ككونستراكتور لا زال تحت المراجعة");
+          }
+
+          if (contractorStatus === "REJECTED") {
+            throw new Error("تم رفض طلب التسجيل ككونستراكتور");
+          }
+
+          if (contractorStatus === "SUSPENDED") {
+            throw new Error("تم تعليق حسابك ككونستراكتور مؤقتاً");
+          }
+
+          // السماح بالدخول فقط للكونستراكتور المقبول
+          if (contractorStatus !== "APPROVED") {
+            throw new Error("حالة الحساب غير صالحة");
+          }
         }
 
         return {

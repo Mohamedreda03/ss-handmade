@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FaCartShopping } from "react-icons/fa6";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface ProductWithCreator extends Product {
   User?: {
@@ -23,8 +25,36 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const addItem = useCartStore((state) => state.addItem);
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const handleAddToCart = () => {
+    // التحقق من تسجيل الدخول
+    if (!session) {
+      toast.error("يجب تسجيل الدخول", {
+        description: (
+          <div className="flex flex-col gap-2">
+            <span>يجب عليك تسجيل الدخول أولاً لإضافة المنتجات إلى السلة</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => router.push("/sign-in")}
+                className="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary/90"
+              >
+                تسجيل الدخول
+              </button>
+              <button
+                onClick={() => router.push("/sign-up")}
+                className="px-3 py-1 border border-primary text-primary rounded text-sm hover:bg-primary/10"
+              >
+                إنشاء حساب
+              </button>
+            </div>
+          </div>
+        ),
+      });
+      return;
+    }
+
     addItem({
       productId: product.id,
       name: product.name,
@@ -34,11 +64,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
     });
 
     toast.success("تمت الإضافة للسلة", {
-      description: `تمت إضافة ${product.name} إلى سلة التسوق`,
-      action: {
-        label: "عرض السلة",
-        onClick: () => (window.location.href = "/cart"),
-      },
+      description: (
+        <div className="flex flex-col gap-2">
+          <span>تمت إضافة {product.name} إلى سلة التسوق</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => (window.location.href = "/cart")}
+              className="px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary/90"
+            >
+              عرض السلة
+            </button>
+            <button
+              onClick={() => (window.location.href = "/products")}
+              className="px-3 py-1 border border-primary text-primary rounded text-sm hover:bg-primary/10"
+            >
+              إكمال التسوق
+            </button>
+          </div>
+        </div>
+      ),
     });
   };
 

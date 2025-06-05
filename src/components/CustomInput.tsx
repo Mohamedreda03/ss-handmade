@@ -32,35 +32,68 @@ export default function CustomInput({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="relative">
+        <FormItem className="relative space-y-2">
           <FormControl>
             <div
               className={cn(
-                "border  dark:border-first rounded h-12 flex",
-                className,
-                {
-                  "border-red-500": error,
-                }
+                "relative group transition-all duration-200",
+                className
               )}
             >
-              <div className="w-12 h-full flex items-center justify-center dark:bg-first/20">
-                <Icon size={20} className="text-primary/70 bg-transparent" />
+              <div
+                className={cn(
+                  "flex items-center border-2 rounded-xl transition-all duration-200 bg-white shadow-sm hover:shadow-md focus-within:shadow-lg",
+                  {
+                    "border-red-500 bg-red-50": error,
+                    "border-gray-200 hover:border-gray-300 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10":
+                      !error,
+                  }
+                )}
+                style={{ height: "56px" }}
+              >
+                <div
+                  className={cn(
+                    "flex items-center justify-center w-14 h-full rounded-r-xl transition-colors duration-200",
+                    {
+                      "bg-red-100": error,
+                      "bg-gray-50 group-hover:bg-gray-100 group-focus-within:bg-primary/5":
+                        !error,
+                    }
+                  )}
+                >
+                  <Icon
+                    size={22}
+                    className={cn("transition-colors duration-200", {
+                      "text-red-500": error,
+                      "text-gray-400 group-hover:text-gray-600 group-focus-within:text-primary":
+                        !error,
+                    })}
+                  />
+                </div>
+                <Input
+                  {...field}
+                  type={type ? type : "text"}
+                  className={cn(
+                    "border-0 bg-transparent h-full px-4 text-base placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0",
+                    {
+                      "text-right": dir === "rtl",
+                      "text-left": dir === "ltr",
+                    }
+                  )}
+                  placeholder={placeholder}
+                  disabled={disabled}
+                  dir={dir}
+                  style={{
+                    borderRadius:
+                      dir === "rtl" ? "0 12px 12px 0" : "12px 0 0 12px",
+                  }}
+                />
               </div>
-              <Input
-                {...field}
-                type={type ? type : "text"}
-                className={cn("shad-input", {
-                  "placeholder:text-end ml-4": dir === "ltr",
-                })}
-                placeholder={placeholder}
-                disabled={disabled}
-                dir={dir}
-              />
             </div>
           </FormControl>
-          {/* <FormMessage /> */}
           {error && (
-            <p className="absolute text-red-400 -bottom-5 text-sm">
+            <p className="text-red-500 text-sm font-medium flex items-center gap-1 mt-1">
+              <span className="w-1 h-1 bg-red-500 rounded-full"></span>
               {error === "Required" ? "هذا الحقل مطلوب" : error}
             </p>
           )}

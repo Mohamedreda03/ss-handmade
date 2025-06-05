@@ -26,14 +26,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { navigationMenu } from "./navbar/NavLinks";
+import { useCartStore } from "@/store/useCartStore";
 
 const roles = ["ADMIN", "CONSTRUCTOR"];
 
 export default function AuthMenu({ session }: { session: any }) {
   const isLoggedIn = !!session;
   const avatar = session?.user?.name?.slice(0, 2)?.toLocaleUpperCase() || "?";
+  const clearCart = useCartStore((state) => state.clearCart);
 
   const handleSignOut = async () => {
+    // مسح السلة قبل تسجيل الخروج
+    clearCart();
+
     await signOut({
       redirectTo: "/",
     });

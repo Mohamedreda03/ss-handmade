@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { dashRoles } from "@/lib/dashRoles";
 import { auth } from "@/auth";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface Course {
   id: string;

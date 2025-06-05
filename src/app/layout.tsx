@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster as SonnerToaster } from "sonner";
 import { NextAuthProvider } from "@/components/Providers/NextAuthProvider";
+import { CartManager } from "@/components/CartManager";
 
 import { El_Messiri } from "next/font/google";
 
@@ -121,15 +122,16 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            {" "}
             <ReactHotToaster />
             <NextAuthProvider>
+              <CartManager />
               {children}
               <SonnerToaster position="top-center" />
             </NextAuthProvider>
             <ShadcnToaster />
           </ThemeProvider>
         </body>
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!} />
       </Providers>
     </html>
   );

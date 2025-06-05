@@ -101,7 +101,6 @@ export default function AdminSuccessStoriesPage() {
       setContentLoading(false);
     }
   };
-
   useEffect(() => {
     if (status === "authenticated") {
       if (session?.user?.role !== "ADMIN") {
@@ -114,7 +113,7 @@ export default function AdminSuccessStoriesPage() {
     } else if (status === "unauthenticated") {
       router.push("/sign-in");
     }
-  }, [status, session, router, activeTab]);
+  }, [status, session, router, activeTab, fetchStories]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || (pagination && page > pagination.totalPages)) return;
@@ -292,12 +291,17 @@ export default function AdminSuccessStoriesPage() {
                             <span className="font-medium mr-1">
                               {story.user.name || story.user.email || "مستخدم"}
                             </span>
-                          </div>
+                          </div>{" "}
                           <div>
                             <span>تاريخ الإضافة:</span>
                             <span className="font-medium mr-1">
                               {new Date(story.createdAt).toLocaleDateString(
-                                "ar-EG"
+                                "ar-EG",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
                               )}
                             </span>
                           </div>

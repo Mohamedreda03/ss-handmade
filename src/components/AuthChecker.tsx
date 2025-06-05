@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { BadgeInfo } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
+import { useCartStore } from "@/store/useCartStore";
 
 export default function AuthChecker({
   children,
@@ -15,12 +16,16 @@ export default function AuthChecker({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const clearCart = useCartStore((state) => state.clearCart);
 
   const checkAuth = useCallback(async () => {
     const isUserAuth = await isAuth();
     const session = await getServerSession();
 
     if (session && !isUserAuth) {
+      // مسح السلة قبل تسجيل الخروج
+      clearCart();
+
       await signout();
       toast({
         variant: "destructive",
@@ -33,7 +38,7 @@ export default function AuthChecker({
       });
       router.refresh();
     }
-  }, [router]);
+  }, [router, clearCart]);
 
   useEffect(() => {
     checkAuth();

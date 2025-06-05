@@ -7,11 +7,25 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Filter,
+} from "lucide-react";
 import TestimonialCTA from "@/components/TestimonialCTA";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import "./success-stories.css";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // قصص احتياطية في حالة عدم وجود قصص معتمدة
 const fallbackStories = [
@@ -75,10 +89,16 @@ interface SuccessStory {
   achievement: string;
   course?: string;
   imageUrl?: string;
+  createdAt: string;
   user: {
     name?: string;
     image?: string;
   };
+}
+
+interface Filters {
+  professions: string[];
+  courses: string[];
 }
 
 export default function SuccessStoriesPage() {
@@ -87,12 +107,45 @@ export default function SuccessStoriesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [filters, setFilters] = useState<Filters>({
+    professions: [],
+    courses: [],
+  });
+  const [selectedProfession, setSelectedProfession] = useState<string>("all");
+  const [selectedCourse, setSelectedCourse] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
+
+  // جلب الفلاتر المتاحة
+  const fetchFilters = async () => {
+    try {
+      const response = await axios.get("/api/success-stories/filters");
+      setFilters(response.data);
+    } catch (error) {
+      console.error("Error fetching filters:", error);
+    }
+  };
 
   const fetchStories = async (page = 1) => {
     try {
       setIsLoading(true);
+
+      // بناء المعاملات
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "6",
+        sortBy: sortBy,
+      });
+
+      if (selectedProfession !== "all") {
+        params.append("profession", selectedProfession);
+      }
+
+      if (selectedCourse !== "all") {
+        params.append("course", selectedCourse);
+      }
+
       const response = await axios.get(
-        `/api/success-stories?page=${page}&limit=6`
+        `/api/success-stories?${params.toString()}`
       );
 
       if (
@@ -116,8 +169,16 @@ export default function SuccessStoriesPage() {
   };
 
   useEffect(() => {
+    fetchFilters();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1); // إعادة تعيين الصفحة عند تغيير الفلاتر
+  }, [selectedProfession, selectedCourse, sortBy]);
+
+  useEffect(() => {
     fetchStories(currentPage);
-  }, [currentPage]);
+  }, [currentPage, selectedProfession, selectedCourse, sortBy]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || (pagination && page > pagination.totalPages)) return;
@@ -154,6 +215,76 @@ export default function SuccessStoriesPage() {
             </Link>
           </div>
         )}
+      </motion.div>
+
+      {/* قسم الفلاتر */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-8 p-6 bg-gray-50 rounded-lg"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Filter className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-semibold">تصفية القصص</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* فلتر المهنة */}
+          <div>
+            <label className="block text-sm font-medium mb-2">المهنة</label>
+            <Select
+              value={selectedProfession}
+              onValueChange={setSelectedProfession}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر المهنة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع المهن</SelectItem>
+                {filters.professions.map((profession) => (
+                  <SelectItem key={profession} value={profession}>
+                    {profession}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* فلتر الدورة */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              الدورة التدريبية
+            </label>
+            <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الدورة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الدورات</SelectItem>
+                {filters.courses.map((course) => (
+                  <SelectItem key={course} value={course}>
+                    {course}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* فلتر الترتيب */}
+          <div>
+            <label className="block text-sm font-medium mb-2">ترتيب حسب</label>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الترتيب" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">الأحدث أولاً</SelectItem>
+                <SelectItem value="oldest">الأقدم أولاً</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </motion.div>
 
       {isLoading ? (
@@ -197,16 +328,41 @@ export default function SuccessStoriesPage() {
                     </div>
                   </Link>
                   <CardContent className="pt-6 pb-8 px-6">
+                    <div className="flex items-center gap-2 mb-3 text-sm text-gray-500">
+                      <Calendar className="h-4 w-4" />
+                      <span>
+                        {story.createdAt
+                          ? new Date(story.createdAt).toLocaleDateString(
+                              "ar-EG",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )
+                          : "تاريخ غير محدد"}
+                      </span>
+                    </div>
+
                     <h3 className="text-2xl font-bold mb-1">{story.name}</h3>
                     <p className="text-primary font-medium mb-4">
                       {story.profession}
                     </p>
+
+                    {story.course && (
+                      <div className="mb-3">
+                        <Badge variant="outline" className="text-xs">
+                          {story.course}
+                        </Badge>
+                      </div>
+                    )}
+
                     <p className="text-gray-600 mb-6 text-right leading-relaxed">
-                      {story.story.length > 250
-                        ? `${story.story.substring(0, 250)}...`
+                      {story.story.length > 200
+                        ? `${story.story.substring(0, 200)}...`
                         : story.story}
                     </p>
-                    <div className="mt-auto flex justify-between items-center mt-4">
+                    <div className="flex justify-between items-center mt-auto">
                       <Link href={`/success-stories/${story.id}`}>
                         <Button
                           variant="link"

@@ -47,12 +47,10 @@ model User {
 
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  TestAnswer    TestAnswer[]
   Payment       Payment[]
   Subscription  Subscription[]
   VideoUserData VideoUserData[]
   FileUserData  FileUserData[]
-  TestUserData  TestUserData[]
 
   sessions Session[]
   History  History[]
@@ -156,16 +154,6 @@ model Lesson {
   courseId    String
   isFree      Boolean     @default(false)
 
-  // test data
-  testQuestions             TestQuestion[]
-  hours                     Int?           @default(0)
-  minutes                   Int?           @default(0)
-  number_of_entries_allowed Int?           @default(1)
-  exam_allowed_from         String?
-  exam_allowed_to           String?
-  show_answers              Boolean?       @default(false)
-  TestAnswer                TestAnswer[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -174,7 +162,6 @@ model Lesson {
 
   VideoUserData VideoUserData[]
   FileUserData  FileUserData[]
-  TestUserData  TestUserData[]
 
   @@index([position])
 }
@@ -186,60 +173,7 @@ enum VideoTypes {
 
 enum Type {
   video
-  test
   file
-  sheet
-}
-
-model TestQuestion {
-  id            String    @id @default(uuid())
-  question      String?
-  image_url     String?
-  answers       Answers[]
-  currectAnswer Int
-  index         Int
-  lessonId      String
-
-  explanation_text  String?
-  explanation_image String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  lesson         Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  questionAnswer TestAnswer[]
-}
-
-model Answers {
-  id             String       @id @default(uuid())
-  testQuestionId String
-  image_url      String?
-  answer         String?
-  index          Int?
-  TestQuestion   TestQuestion @relation(fields: [testQuestionId], references: [id], onDelete: Cascade)
-}
-
-model TestUserData {
-  id       String @id @default(uuid())
-  userId   String
-  lessonId String
-
-  userShowAnswers Boolean @default(false)
-  isCompleted     Boolean @default(false)
-
-  testAnswers TestAnswer[]
-  testResult  Int?
-  testEndTime DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@index([testResult])
-  @@index([userShowAnswers])
-  @@index([isCompleted])
 }
 
 model VideoUserData {
@@ -266,23 +200,6 @@ model FileUserData {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-}
-
-model TestAnswer {
-  id             String   @id @default(uuid())
-  userId         String
-  lessonId       String
-  testQuestionId String
-  answer         Int
-  isCorrect      Boolean
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson         Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  testQuestion   TestQuestion  @relation(fields: [testQuestionId], references: [id], onDelete: Cascade)
-  TestUserData   TestUserData? @relation(fields: [testUserDataId], references: [id], onDelete: Cascade)
-  testUserDataId String?
 }
 
 model Payment {
@@ -481,14 +398,14 @@ model SuccessStory {
   @@index([userId])
 }
 
-// نموذج ملف الكونستراكتور
+// نموذج ملف كونستركتور
 model ContractorProfile {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // البيانات الأساسية
-  bio            String? @db.Text // نبذة عن الكونستراكتور
+  bio            String? @db.Text // نبذة عن كونستركتور
   specialization String? // التخصص
   experience     String? // سنوات الخبرة
 

@@ -8,7 +8,6 @@ import {
   Barcode,
   QrCode,
   History,
-  FlaskConical,
   Package,
   ShoppingBag,
   Star,
@@ -98,7 +97,7 @@ export const admin_menu_data: MenuData[] = [
   {
     id: 10,
     link: `/admin/contractors`,
-    title: "الكونستراكتور",
+    title: "كونستركتور",
     Icon: HardHat,
     role: ["ADMIN"],
   },

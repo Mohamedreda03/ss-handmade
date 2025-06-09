@@ -44,7 +44,9 @@ export async function POST(
     });
 
     if (existingSubscription) {
-      return new NextResponse("Already subscribed to this course", { status: 400 });
+      return new NextResponse("Already subscribed to this course", {
+        status: 400,
+      });
     }
 
     const addDaysToCurrent = (days: number) => {
@@ -56,8 +58,11 @@ export async function POST(
     const expireDate = addDaysToCurrent(7);
 
     // Generate invoice ID and reference if not provided
-    const invoice_id = body.invoice_id || Math.floor(Math.random() * 1000000).toString();
-    const invoice_ref = body.invoice_ref || "REF-" + Math.floor(Math.random() * 1000000).toString();
+    const invoice_id =
+      body.invoice_id || Math.floor(Math.random() * 1000000).toString();
+    const invoice_ref =
+      body.invoice_ref ||
+      "REF-" + Math.floor(Math.random() * 1000000).toString();
 
     // Create payment record
     const payment = await prisma.payment.create({

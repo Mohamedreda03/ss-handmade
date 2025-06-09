@@ -26,19 +26,6 @@ export async function GET(
             userId: userId,
           },
         },
-        TestUserData: {
-          where: {
-            userId: userId,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        _count: {
-          select: {
-            testQuestions: true,
-          },
-        },
       },
     });
 

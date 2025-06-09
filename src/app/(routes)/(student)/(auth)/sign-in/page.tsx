@@ -35,7 +35,7 @@ const SigninSchema = z.object({
   password: z
     .string()
     .min(8, "كلمة المرور يجب ان تكون 8 احرف علي الاقل")
-    .max(50, "كلمة المرور يجب ان تكون 50 حرف علي الاكثر"),
+    .max(100, "كلمة المرور يجب ان تكون اقل من 100 حرف"),
 });
 
 export const dynamic = "force-dynamic";
@@ -53,7 +53,7 @@ export default function SignIn() {
         })
         .then(async (res: any) => {
           if (res.data.error) {
-            // عرض رسائل مخصصة حسب حالة الكونستراكتور
+            // عرض رسائل مخصصة حسب حالة الكونستركتور
             const contractorStatus = res.data.contractorStatus;
             let description = res.data.message;
             let variant: "destructive" | "default" = "destructive";
@@ -66,7 +66,7 @@ export default function SignIn() {
                     <span className="font-semibold">طلبك قيد المراجعة</span>
                   </div>{" "}
                   <p className="text-sm">
-                    حسابك ككونستراكتور لا زال تحت المراجعة من قبل الإدارة. يرجى
+                    حسابك ككونستركتور لا زال تحت المراجعة من قبل الإدارة. يرجى
                     المحاولة مرة أخرى لاحقاً.
                   </p>
                 </div>
@@ -80,7 +80,7 @@ export default function SignIn() {
                     <span className="font-semibold">تم رفض الطلب</span>
                   </div>{" "}
                   <p className="text-sm">
-                    تم رفض طلب التسجيل ككونستراكتور. يمكنك مراجعة بياناتك وإعادة
+                    تم رفض طلب التسجيل ككونستركتور. يمكنك مراجعة بياناتك وإعادة
                     التقديم أو التواصل مع الإدارة للحصول على مزيد من التفاصيل.
                   </p>
                 </div>
@@ -93,7 +93,7 @@ export default function SignIn() {
                     <span className="font-semibold">الحساب معلق مؤقتاً</span>
                   </div>{" "}
                   <p className="text-sm">
-                    تم تعليق حسابك ككونستراكتور مؤقتاً. يرجى التواصل مع الإدارة
+                    تم تعليق حسابك ككونستركتور مؤقتاً. يرجى التواصل مع الإدارة
                     لمعرفة أسباب التعليق وخطوات إعادة التفعيل.
                   </p>
                 </div>
@@ -139,11 +139,11 @@ export default function SignIn() {
       dir="rtl"
     >
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
+      {/* <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-[#6F7354]/20 to-[#888C69]/20 rounded-full blur-xl"></div>
         <div className="absolute bottom-32 left-20 w-48 h-48 bg-gradient-to-br from-[#888C69]/20 to-[#6F7354]/20 rounded-full blur-xl"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-[#6F7354]/10 to-[#888C69]/10 rounded-full blur-2xl"></div>
-      </div>
+      </div> */}
 
       <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-lg w-full">
@@ -198,15 +198,14 @@ export default function SignIn() {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
+                    {" "}
                     <CustomInput
                       Icon={Mail}
                       placeholder="البريد الإلكتروني"
                       name="email"
                       control={form.control}
                       error={form.formState.errors.email?.message}
-                      dir="ltr"
                     />
-
                     <CustomInput
                       Icon={Key}
                       placeholder="كلمة المرور"
@@ -214,9 +213,7 @@ export default function SignIn() {
                       name="password"
                       control={form.control}
                       error={form.formState.errors.password?.message}
-                      dir="ltr"
                     />
-
                     <Button
                       type="submit"
                       className="w-full h-14 text-xl font-semibold bg-gradient-to-r from-[#6F7354] to-[#888C69] hover:from-[#5A5F44] hover:to-[#6F7354] text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"

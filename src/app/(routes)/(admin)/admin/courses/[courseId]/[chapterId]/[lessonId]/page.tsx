@@ -3,15 +3,10 @@
 import AddFile from "@/components/admin_dashboard/AddFile";
 import DeleteAlert from "@/components/admin_dashboard/DeleteAlert";
 import EditLessonTitle from "@/components/admin_dashboard/EditLessonTitle";
-import EditTestTime from "@/components/admin_dashboard/EditTestTime";
 import IsPublishedButton from "@/components/admin_dashboard/IsPublishedButton";
-import EditTestNumberEntriesAllowed from "@/components/admin_dashboard/lessons/EditTestNumberEntriesAllowed";
 import IsLessonFree from "@/components/admin_dashboard/lessons/IsLessonFree";
-import TestFromTo from "@/components/admin_dashboard/lessons/TestFromTo";
-import Test from "@/components/admin_dashboard/Test";
 import UploadVideo from "@/components/admin_dashboard/UploadVideo";
 import Loading from "@/components/Loading";
-import { cn } from "@/lib/utils";
 import axios from "axios";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -71,21 +66,9 @@ export default function LessonPage({
               apiEndpoint={`/api/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`}
             />
           </div>
-        </div>
-
-        <div
-          className={cn(
-            "flex flex-col gap-5",
-            data?.lesson?.type === "test" || data?.lesson?.type === "sheet"
-              ? ""
-              : "md:flex-row"
-          )}
-        >
-          <div
-            className={cn("flex flex-col gap-5", {
-              "md:flex-1": data?.lesson?.type !== "test",
-            })}
-          >
+        </div>{" "}
+        <div className="flex flex-col gap-5 md:flex-row">
+          <div className="flex flex-col gap-5 md:flex-1">
             <EditLessonTitle
               title={data?.lesson?.title!}
               courseId={courseId}
@@ -99,11 +82,7 @@ export default function LessonPage({
               lesson={data?.lesson}
             />
           </div>
-          <div
-            className={cn("flex flex-col gap-5", {
-              "md:flex-1": data?.lesson?.type !== "test",
-            })}
-          >
+          <div className="flex flex-col gap-5 md:flex-1">
             {data && data?.lesson?.type === "video" && (
               <UploadVideo
                 courseId={courseId}
@@ -114,41 +93,6 @@ export default function LessonPage({
                 videoId={data?.lesson.videoId!}
               />
             )}
-
-            {data &&
-              (data?.lesson?.type === "test" ||
-                data?.lesson?.type === "sheet") && (
-                <>
-                  <EditTestTime
-                    lessonId={params.lessonId}
-                    courseId={courseId}
-                    chapterId={chapterId}
-                    lesson={data?.lesson}
-                  />
-                  {data?.lesson?.type === "sheet" && (
-                    <EditTestNumberEntriesAllowed
-                      lessonId={params.lessonId}
-                      courseId={courseId}
-                      chapterId={chapterId}
-                      lesson={data?.lesson}
-                    />
-                  )}
-
-                  <TestFromTo
-                    lessonId={params.lessonId}
-                    courseId={courseId}
-                    chapterId={chapterId}
-                    lesson={data?.lesson}
-                  />
-
-                  <Test
-                    courseId={params.courseId}
-                    chapterId={params.chapterId}
-                    lessonId={params.lessonId}
-                    lesson={data?.lesson}
-                  />
-                </>
-              )}
 
             {data && data?.lesson?.type === "file" && (
               <AddFile

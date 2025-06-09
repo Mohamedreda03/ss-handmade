@@ -9,11 +9,6 @@ async function deleteChapter(chapterId: string) {
     // جلب الدروس المرتبطة بالفصل للحصول على الملفات
     const lessons = await prisma.lesson.findMany({
       where: { chapterId },
-      include: {
-        testQuestions: {
-          include: { answers: true },
-        },
-      },
     });
 
     for (const lesson of lessons) {
@@ -26,23 +21,6 @@ async function deleteChapter(chapterId: string) {
       // if (lesson.videoUrl) {
       //   await deleteFile(lesson.videoUrl);
       // }
-
-      // حذف صور الأسئلة والإجابات
-      for (const question of lesson.testQuestions) {
-        if (question.image_url) {
-          await axios.delete(`/api/upload`, {
-            data: { path: question.image_url },
-          });
-        }
-
-        for (const answer of question.answers) {
-          if (answer.image_url) {
-            await axios.delete(`/api/upload`, {
-              data: { path: answer.image_url },
-            });
-          }
-        }
-      }
     }
 
     // حذف الفصل (الحذف التلقائي سيهتم بالبيانات المرتبطة الأخرى)

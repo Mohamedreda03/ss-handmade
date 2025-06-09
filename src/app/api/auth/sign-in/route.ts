@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         email: body.email,
       },
       include: {
-        contractorProfile: true, // تضمين بيانات ملف الكونستراكتور
+        contractorProfile: true, // تضمين بيانات ملف كونستركتور
       },
     });
 
@@ -31,13 +31,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // التحقق من حالة الكونستراكتور إذا كان المستخدم كونستراكتور
+    // التحقق من حالة الكونستركتور إذا كان المستخدم كونستركتور
     if (user.role === "CONSTRUCTOR") {
       if (!user.contractorProfile) {
         return NextResponse.json({
           error: true,
           message:
-            "لم يتم العثور على ملف الكونستراكتور الخاص بك. يرجى التواصل مع الإدارة.",
+            "لم يتم العثور على ملف الكونستركتور الخاص بك. يرجى التواصل مع الإدارة.",
           contractorStatus: "NO_PROFILE",
         });
       }
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "حسابك ككونستراكتور لا زال تحت المراجعة. يرجى المحاولة مرة أخرى لاحقاً.",
+            "حسابك ككونستركتور لا زال تحت المراجعة. يرجى المحاولة مرة أخرى لاحقاً.",
           contractorStatus: "PENDING",
         });
       }
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "تم رفض طلب التسجيل ككونستراكتور. يرجى مراجعة بياناتك وإعادة التقديم أو التواصل مع الإدارة.",
+            "تم رفض طلب التسجيل ككونستركتور. يرجى مراجعة بياناتك وإعادة التقديم أو التواصل مع الإدارة.",
           contractorStatus: "REJECTED",
         });
       }
@@ -65,12 +65,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "تم تعليق حسابك ككونستراكتور مؤقتاً. يرجى التواصل مع الإدارة لمزيد من التفاصيل.",
+            "تم تعليق حسابك ككونستركتور مؤقتاً. يرجى التواصل مع الإدارة لمزيد من التفاصيل.",
           contractorStatus: "SUSPENDED",
         });
       }
 
-      // إذا كان الكونستراكتور مقبول (APPROVED)، يمكنه تسجيل الدخول
+      // إذا كان الكونستركتور مقبول (APPROVED)، يمكنه تسجيل الدخول
       if (contractorStatus !== "APPROVED") {
         return NextResponse.json({
           error: true,

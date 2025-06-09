@@ -38,15 +38,6 @@ export async function GET(
               isPublished: true,
               video_type: true,
 
-              _count: {
-                select: {
-                  TestUserData: {
-                    where: {
-                      userId: session?.user.id,
-                    },
-                  },
-                },
-              },
               FileUserData: {
                 where: {
                   userId: session?.user.id,

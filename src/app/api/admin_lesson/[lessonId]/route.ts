@@ -35,17 +35,11 @@ export async function GET(
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     const lesson = await prisma.lesson.findFirst({
       where: {
         id: lessonId,
       },
       include: {
-        testQuestions: {
-          include: {
-            answers: true,
-          },
-        },
         chapter: {
           include: {
             course: {
@@ -67,31 +61,12 @@ export async function GET(
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     let requiredFields: any[] = [];
-
-    let isTimeValid = lesson?.hours! > 0 || lesson?.minutes! > 0;
 
     if (lesson?.type === "video") {
       requiredFields = [lesson.title, lesson.videoUrl || lesson.videoId];
     } else if (lesson?.type === "file") {
       requiredFields = [lesson.title, lesson.fileUrl];
-    } else if (lesson?.type === "test") {
-      requiredFields = [
-        lesson.title,
-        lesson.testQuestions.length > 0,
-        isTimeValid,
-        lesson.exam_allowed_from,
-        lesson.exam_allowed_to,
-      ];
-    } else if (lesson?.type === "sheet") {
-      requiredFields = [
-        lesson.title,
-        lesson.testQuestions.length > 0,
-        isTimeValid,
-        lesson.number_of_entries_allowed,
-        lesson.exam_allowed_from,
-      ];
     }
 
     const totalFields = requiredFields.length;

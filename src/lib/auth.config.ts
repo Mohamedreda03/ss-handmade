@@ -59,7 +59,7 @@ export default {
             email,
           },
           include: {
-            contractorProfile: true, // تضمين بيانات ملف الكونستراكتور
+            contractorProfile: true, // تضمين بيانات ملف كونستركتور
           },
         });
 
@@ -71,26 +71,26 @@ export default {
 
         if (!isPasswordValid) {
           return null;
-        } // التحقق من حالة الكونستراكتور إذا كان المستخدم كونستراكتور
+        } // التحقق من حالة كونستركتور إذا كان المستخدم كونستركتور
         if (user.role === "CONSTRUCTOR") {
           if (!user.contractorProfile) {
-            throw new Error("لم يتم العثور على ملف الكونستراكتور الخاص بك");
+            throw new Error("لم يتم العثور على ملف كونستركتور الخاص بك");
           }
 
           const contractorStatus = user.contractorProfile.status;
           if (contractorStatus === "PENDING") {
-            throw new Error("حسابك ككونستراكتور لا زال تحت المراجعة");
+            throw new Error("حسابك ككونستركتور لا زال تحت المراجعة");
           }
 
           if (contractorStatus === "REJECTED") {
-            throw new Error("تم رفض طلب التسجيل ككونستراكتور");
+            throw new Error("تم رفض طلب التسجيل ككونستركتور");
           }
 
           if (contractorStatus === "SUSPENDED") {
-            throw new Error("تم تعليق حسابك ككونستراكتور مؤقتاً");
+            throw new Error("تم تعليق حسابك ككونستركتور مؤقتاً");
           }
 
-          // السماح بالدخول فقط للكونستراكتور المقبول
+          // السماح بالدخول فقط للكونستركتور المقبول
           if (contractorStatus !== "APPROVED") {
             throw new Error("حالة الحساب غير صالحة");
           }

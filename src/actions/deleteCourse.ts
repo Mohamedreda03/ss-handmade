@@ -7,11 +7,6 @@ export async function deleteCourse(courseId: string) {
     // جلب الدروس المرتبطة للحصول على الصور
     const lessons = await prisma.lesson.findMany({
       where: { courseId },
-      include: {
-        testQuestions: {
-          include: { answers: true },
-        },
-      },
     });
 
     for (const lesson of lessons) {
@@ -24,23 +19,6 @@ export async function deleteCourse(courseId: string) {
       // if (lesson.videoUrl) {
       //   await deleteFile(lesson.videoUrl);
       // }
-
-      // حذف صور الأسئلة والإجابات
-      for (const question of lesson.testQuestions) {
-        if (question.image_url) {
-          await axios.delete(`/api/upload`, {
-            data: { path: question.image_url },
-          });
-        }
-
-        for (const answer of question.answers) {
-          if (answer.image_url) {
-            await axios.delete(`/api/upload`, {
-              data: { path: answer.image_url },
-            });
-          }
-        }
-      }
     }
 
     // حذف الكورس (الحذف التلقائي سيتكفل بالباقي)

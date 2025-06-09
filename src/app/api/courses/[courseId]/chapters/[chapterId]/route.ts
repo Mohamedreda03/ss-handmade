@@ -85,23 +85,13 @@ export async function DELETE(
       chapterAccess.course.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // استرجاع الـ Chapter والعلاقات المرتبطة
+    } // استرجاع الـ Chapter والعلاقات المرتبطة
     const chapter = await prisma.chapter.findUnique({
       where: {
         id: chapterId,
       },
       include: {
-        Lesson: {
-          include: {
-            testQuestions: {
-              include: {
-                answers: true,
-              },
-            },
-          },
-        },
+        Lesson: true,
       },
     });
 
@@ -109,42 +99,8 @@ export async function DELETE(
       return new NextResponse("Chapter not found", { status: 404 });
     }
 
-    // حذف الصور المرتبطة بالـ Lessons
+    // حذف الملفات المرتبطة بالـ Lessons
     for (const lesson of chapter.Lesson) {
-      if (lesson.testQuestions.length) {
-        for (const question of lesson.testQuestions) {
-          if (question.image_url) {
-            const fileName = question.image_url.split("/").pop() as string;
-            const path = join(
-              process.cwd(),
-              "..",
-              "uploads",
-              "images",
-              fileName
-            );
-            if (existsSync(path)) {
-              unlinkSync(path);
-            }
-          }
-
-          for (const answer of question.answers) {
-            if (answer.image_url) {
-              const fileName = answer.image_url.split("/").pop() as string;
-              const path = join(
-                process.cwd(),
-                "..",
-                "uploads",
-                "images",
-                fileName
-              );
-              if (existsSync(path)) {
-                unlinkSync(path);
-              }
-            }
-          }
-        }
-      }
-
       if (lesson.fileUrl) {
         const fileName = lesson.fileUrl.split("/").pop() as string;
         const path = join(process.cwd(), "..", "uploads", "files", fileName);

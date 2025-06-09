@@ -166,15 +166,7 @@ export async function DELETE(
       include: {
         chapters: {
           include: {
-            Lesson: {
-              include: {
-                testQuestions: {
-                  include: {
-                    answers: true,
-                  },
-                },
-              },
-            },
+            Lesson: true,
           },
         },
       },
@@ -182,45 +174,9 @@ export async function DELETE(
 
     if (!course) {
       return new NextResponse("Course not found", { status: 404 });
-    }
-
-    // حذف الصور والملفات المرتبطة بالدروس
+    } // حذف الصور والملفات المرتبطة بالدروس
     for (const chapter of course.chapters) {
       for (const lesson of chapter.Lesson) {
-        if (lesson.testQuestions.length) {
-          for (const question of lesson.testQuestions) {
-            if (question.image_url) {
-              const fileName = question.image_url.split("/").pop() as string;
-              const path = join(
-                process.cwd(),
-                "..",
-                "uploads",
-                "images",
-                fileName
-              );
-              if (existsSync(path)) {
-                unlinkSync(path);
-              }
-            }
-
-            for (const answer of question.answers) {
-              if (answer.image_url) {
-                const fileName = answer.image_url.split("/").pop() as string;
-                const path = join(
-                  process.cwd(),
-                  "..",
-                  "uploads",
-                  "images",
-                  fileName
-                );
-                if (existsSync(path)) {
-                  unlinkSync(path);
-                }
-              }
-            }
-          }
-        }
-
         if (lesson.fileUrl) {
           const fileName = lesson.fileUrl.split("/").pop() as string;
           const path = join(process.cwd(), "..", "uploads", "files", fileName);

@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Coupon } from "@prisma/client";
-import DeleteCouponModel from "@/components/admin_dashboard/coupons/DeleteTestDataModel";
+import DeleteCouponModel from "@/components/admin_dashboard/coupons/DeleteCouponModel";
 import Link from "next/link";
 import Pagenation from "@/components/Pagenation";
 

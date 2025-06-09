@@ -95,50 +95,14 @@ export async function DELETE(
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     const lesson = await prisma.lesson.findUnique({
       where: {
         id: lessonId,
-      },
-      include: {
-        testQuestions: {
-          include: {
-            answers: true,
-          },
-        },
       },
     });
 
     if (!lesson) {
       return new NextResponse("Lesson not found", { status: 404 });
-    }
-
-    if (lesson.testQuestions.length) {
-      for (let i = 0; i < lesson.testQuestions.length; i++) {
-        if (lesson.testQuestions[i].image_url) {
-          const fileName = lesson?.testQuestions[i]?.image_url
-            ?.split("/")
-            .pop() as string;
-
-          let path = join(process.cwd(), "..", "uploads", "images", fileName);
-
-          if (existsSync(path)) {
-            unlinkSync(path);
-          }
-        }
-
-        lesson.testQuestions[i].answers.forEach(async (answer) => {
-          if (answer.image_url) {
-            const fileName = answer.image_url.split("/").pop() as string;
-
-            let path = join(process.cwd(), "..", "uploads", "images", fileName);
-
-            if (existsSync(path)) {
-              unlinkSync(path);
-            }
-          }
-        });
-      }
     }
 
     if (lesson.fileUrl) {
@@ -204,13 +168,9 @@ export async function GET(
         });
       }
     }
-
     const data = await prisma.lesson.findUnique({
       where: {
         id: lessonId,
-      },
-      include: {
-        testQuestions: true,
       },
     });
 

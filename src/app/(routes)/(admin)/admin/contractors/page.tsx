@@ -268,10 +268,10 @@ export default function ContractorsManagementPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-[#6F7354]">
-            إدارة الكونستراكتور
+            إدارة الكونستركتور
           </h1>
           <p className="text-[#3D402C]/70">
-            مراجعة والموافقة على طلبات تسجيل الكونستراكتور
+            مراجعة والموافقة على طلبات تسجيل الكونستركتور
           </p>
         </div>
       </div>{" "}
@@ -565,7 +565,7 @@ export default function ContractorsManagementPage() {
           >
             <DialogHeader>
               <DialogTitle className="text-[#3D402C]">
-                تفاصيل طلب الكونستراكتور
+                تفاصيل طلب الكونستركتور
               </DialogTitle>
               <DialogDescription className="text-[#3D402C]/70">
                 {selectedContractor.user.name} - {selectedContractor.user.email}
@@ -715,21 +715,21 @@ export default function ContractorsManagementPage() {
         <DialogContent dir="rtl">
           <DialogHeader>
             <DialogTitle>
-              {reviewAction === "APPROVED" && "الموافقة على طلب الكونستراكتور"}
-              {reviewAction === "REJECTED" && "رفض طلب الكونستراكتور"}
-              {reviewAction === "SUSPENDED" && "تعليق حساب الكونستراكتور"}
+              {reviewAction === "APPROVED" && "الموافقة على طلب الكونستركتور"}
+              {reviewAction === "REJECTED" && "رفض طلب الكونستركتور"}
+              {reviewAction === "SUSPENDED" && "تعليق حساب الكونستركتور"}
             </DialogTitle>
             <DialogDescription>
               {reviewAction === "APPROVED" &&
-                "سيتم ترقية المستخدم إلى كونستراكتور وسيتمكن من الوصول لميزات الكونستراكتور"}
+                "سيتم ترقية المستخدم إلى كونستركتور وسيتمكن من الوصول لميزات الكونستركتور"}
               {reviewAction === "REJECTED" && "سيتم رفض الطلب وإشعار المستخدم"}
               {reviewAction === "SUSPENDED" &&
-                "سيتم تعليق حساب الكونستراكتور مؤقتاً"}{" "}
+                "سيتم تعليق حساب الكونستركتور مؤقتاً"}{" "}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-center py-2">
-              <p>هل أنت متأكد من تغيير حالة الكونستراكتور؟</p>
+              <p>هل أنت متأكد من تغيير حالة الكونستركتور؟</p>
             </div>
           </div>
 

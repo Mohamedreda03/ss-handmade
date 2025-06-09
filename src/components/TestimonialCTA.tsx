@@ -17,7 +17,7 @@ const TestimonialCTA: React.FC<TestimonialCTAProps> = ({
   ctaLink,
 }) => {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl p-10 my-16">
+    <div className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 text-white rounded-2xl p-10 my-16">
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <svg
           className="w-full h-full"
@@ -59,7 +59,7 @@ const TestimonialCTA: React.FC<TestimonialCTAProps> = ({
           viewport={{ once: true }}
         >
           <svg
-            className="w-12 h-12 mx-auto mb-4 text-blue-300"
+            className="w-12 h-12 mx-auto mb-4 text-white/70"
             fill="currentColor"
             viewBox="0 0 32 32"
             aria-hidden="true"
@@ -73,7 +73,7 @@ const TestimonialCTA: React.FC<TestimonialCTAProps> = ({
 
           <div className="flex flex-col items-center">
             <p className="font-bold text-lg">{author}</p>
-            <p className="text-blue-300">{authorTitle}</p>
+            <p className="text-white/70">{authorTitle}</p>
           </div>
         </motion.div>
 
@@ -86,7 +86,7 @@ const TestimonialCTA: React.FC<TestimonialCTAProps> = ({
         >
           <a
             href={ctaLink}
-            className="inline-block bg-white text-blue-900 font-bold px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors duration-300"
+            className="inline-block bg-white text-primary font-bold px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors duration-300"
           >
             {ctaText}
           </a>

@@ -72,23 +72,24 @@ export const metadata: Metadata = {
     url: "",
     images: [
       {
-        url: "/icons/handmade-favicon.svg",
-        alt: "handmade",
+        url: "/logo.png",
+        alt: "crafteria logo",
       },
     ],
   },
   icons: {
     icon: [
-      { url: "/logo.png", type: "image/png" },
-      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.png?v=2", type: "image/png" },
+      { url: "/favicon.ico?v=2", type: "image/x-icon" },
     ],
     apple: [
       {
-        url: "/logo.png",
+        url: "/favicon.png?v=2",
         sizes: "192x192",
         type: "image/png",
       },
     ],
+    shortcut: "/favicon.ico?v=2",
   },
 };
 
@@ -99,14 +100,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <head>
-        <link
-          rel="icon"
-          href="/icons/handmade-favicon-16.svg"
-          type="image/svg+xml"
-        />
-        <link rel="alternate icon" href="/icons/handmade-favicon.svg" />
-      </head>
       <Providers>
         <body
           className={cn(

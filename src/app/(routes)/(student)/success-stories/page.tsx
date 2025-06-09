@@ -197,7 +197,7 @@ export default function SuccessStoriesPage() {
       >
         <div className="text-center md:text-right mb-6 md:mb-0">
           <h1 className="text-4xl font-bold mb-4">
-            <span className="text-gradient">قصص النجاح</span>
+            <span className="text-primary-darker">قصص النجاح</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl">
             نفخر بعرض قصص طلابنا الملهمة الذين تمكنوا من تحقيق أحلامهم من خلال

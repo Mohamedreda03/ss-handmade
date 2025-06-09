@@ -101,23 +101,16 @@ export default function CheckoutCoursePage() {
       cardholderName: "",
     },
   });
-
   const handleCheckout = async (values: PaymentFormValues) => {
     try {
       setIsLoading(true);
-      // Create a random invoice ID
-      const invoice_id = Math.floor(Math.random() * 1000000).toString();
-      const invoice_ref =
-        "REF-" + Math.floor(Math.random() * 1000000).toString();
 
       // Calculate final price after discount
       const finalPrice = course?.price - discount;
 
-      // Create payment record
-      await axios.post("/api/payment", {
+      // Use the course-specific payment API
+      await axios.post(`/api/courses/${courseId}/payment`, {
         amount: finalPrice,
-        invoice_id,
-        invoice_ref,
         couponId: couponId,
         paymentDetails: {
           cardNumber: values.cardNumber.replace(/\s/g, ""),
@@ -127,10 +120,11 @@ export default function CheckoutCoursePage() {
         },
       });
 
-      // After creating payment, redirect to success page or handle accordingly
+      // After successful payment, redirect to success page
       router.push("/success-payment");
     } catch (error) {
       console.error("Payment error:", error);
+      // TODO: Add proper error handling and user feedback
     } finally {
       setIsLoading(false);
     }

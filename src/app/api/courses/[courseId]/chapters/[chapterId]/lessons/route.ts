@@ -9,6 +9,33 @@ export async function POST(
   try {
     let body = await req.json();
 
+    const session = await auth();
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية إضافة درس
+    const chapterAccess = await prisma.chapter.findUnique({
+      where: { id: params.chapterId },
+      include: {
+        course: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!chapterAccess) {
+      return new NextResponse("Chapter not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      chapterAccess.course.userId !== session.user.id
+    ) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const lessonsLength = await prisma.lesson.count({
       where: {
         chapterId: body.chapterId,
@@ -17,11 +44,6 @@ export async function POST(
 
     body.position = lessonsLength;
     body.chapterId = params.chapterId;
-
-    const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
 
     await prisma.chapter.update({
       where: {

@@ -12,7 +12,18 @@ export async function GET(req: NextRequest) {
         userId: session?.user.id,
       },
       include: {
-        course: true,
+        course: {
+          include: {
+            User: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 

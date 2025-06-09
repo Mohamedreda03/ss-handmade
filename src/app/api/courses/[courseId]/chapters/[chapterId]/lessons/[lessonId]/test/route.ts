@@ -12,8 +12,33 @@ export async function PATCH(
     let body = await req.json();
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // For CONSTRUCTOR, verify ownership of the lesson
+    if (session.user.role === "CONSTRUCTOR") {
+      const lessonAccess = await prisma.lesson.findUnique({
+        where: { id: params.lessonId },
+        include: {
+          chapter: {
+            include: {
+              course: {
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !lessonAccess ||
+        lessonAccess.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized access to this lesson", {
+          status: 401,
+        });
+      }
     }
 
     const questionsLength = await prisma.testQuestion.count({
@@ -58,13 +83,43 @@ export async function PATCH(
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  {
+    params,
+  }: { params: { lessonId: string; chapterId: string; courseId: string } }
+) {
   try {
     let body = await req.json();
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // For CONSTRUCTOR, verify ownership of the lesson
+    if (session.user.role === "CONSTRUCTOR") {
+      const lessonAccess = await prisma.lesson.findUnique({
+        where: { id: params.lessonId },
+        include: {
+          chapter: {
+            include: {
+              course: {
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !lessonAccess ||
+        lessonAccess.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized access to this lesson", {
+          status: 401,
+        });
+      }
     }
 
     const question = await prisma.testQuestion.create({

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -66,36 +64,8 @@ const TestimonialCard = ({ story, index }: TestimonialCardProps) => {
   );
 };
 
-export default function TestimonialsSection() {
-  const [stories, setStories] = useState<SuccessStory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadStories = async () => {
-      try {
-        setIsLoading(true);
-        const result = await getSuccessStories(3);
-
-        if (result && Array.isArray(result)) {
-          setStories(result);
-        } else {
-          setStories([]);
-        }
-      } catch (error) {
-        console.error("Error fetching success stories:", error);
-        setStories([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadStories();
-  }, []);
-
-  // إذا لم تكن هناك قصص، لا نعرض القسم
-  if (!isLoading && stories.length === 0) {
-    return null;
-  }
+export default async function TestimonialsSection() {
+  const stories = await getSuccessStories(3, false); // Get any approved stories, not just featured
 
   return (
     <section className="relative py-16 px-4 overflow-hidden">
@@ -115,17 +85,11 @@ export default function TestimonialsSection() {
           </h2>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
-            {stories.map((story, index) => (
-              <TestimonialCard key={story.id} story={story} index={index} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+          {stories.map((story, index) => (
+            <TestimonialCard key={story.id} story={story} index={index} />
+          ))}
+        </div>
 
         <div className="flex justify-center mt-10">
           <Link href="/success-stories">

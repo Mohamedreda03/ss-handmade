@@ -247,7 +247,7 @@ export default function EditLessons({
             <Droppable droppableId="chapters">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {lessons.map((lesson, index) => (
+                  {lessons?.map((lesson, index) => (
                     <Draggable
                       key={lesson.id}
                       draggableId={lesson.id}

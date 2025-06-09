@@ -11,7 +11,25 @@ export async function POST(
     let { title } = await req.json();
 
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية إضافة فصل للكورس
+    const courseAccess = await prisma.course.findUnique({
+      where: { id: courseId },
+      select: { userId: true },
+    });
+
+    if (!courseAccess) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      courseAccess.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

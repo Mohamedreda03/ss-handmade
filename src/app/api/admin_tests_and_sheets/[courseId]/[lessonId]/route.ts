@@ -10,13 +10,31 @@ export async function GET(
 ) {
   try {
     const session = await auth();
-
-    if (!session) {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (session.user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
+    // For CONSTRUCTOR, verify course ownership through lesson
+    if (session.user.role === "CONSTRUCTOR") {
+      const lessonAccess = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+        include: {
+          chapter: {
+            include: {
+              course: {
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !lessonAccess ||
+        lessonAccess.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized", { status: 401 });
+      }
     }
 
     const lesson = await prisma.lesson.findUnique({

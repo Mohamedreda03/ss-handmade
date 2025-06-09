@@ -4,18 +4,45 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   req: NextRequest,
-  { params: { testQuestionId } }: { params: { testQuestionId: string } }
+  {
+    params: { testQuestionId, lessonId, courseId },
+  }: { params: { testQuestionId: string; lessonId: string; courseId: string } }
 ) {
   try {
     let body = await req.json();
     const session = await auth();
 
-    if (!session) {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (session.user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
+    // For CONSTRUCTOR, verify ownership of the lesson/test question
+    if (session.user.role === "CONSTRUCTOR") {
+      const questionAccess = await prisma.testQuestion.findUnique({
+        where: { id: testQuestionId },
+        include: {
+          lesson: {
+            include: {
+              chapter: {
+                include: {
+                  course: {
+                    select: { userId: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !questionAccess ||
+        questionAccess.lesson.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized access to this test question", {
+          status: 401,
+        });
+      }
     }
 
     await prisma.testQuestion.update({
@@ -62,17 +89,44 @@ export async function PATCH(
 // delete question and answers
 export async function DELETE(
   req: NextRequest,
-  { params: { testQuestionId } }: { params: { testQuestionId: string } }
+  {
+    params: { testQuestionId, lessonId, courseId },
+  }: { params: { testQuestionId: string; lessonId: string; courseId: string } }
 ) {
   try {
     const session = await auth();
 
-    if (!session) {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (session.user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
+    // For CONSTRUCTOR, verify ownership of the lesson/test question
+    if (session.user.role === "CONSTRUCTOR") {
+      const questionAccess = await prisma.testQuestion.findUnique({
+        where: { id: testQuestionId },
+        include: {
+          lesson: {
+            include: {
+              chapter: {
+                include: {
+                  course: {
+                    select: { userId: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !questionAccess ||
+        questionAccess.lesson.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized access to this test question", {
+          status: 401,
+        });
+      }
     }
 
     await prisma.answers.deleteMany({

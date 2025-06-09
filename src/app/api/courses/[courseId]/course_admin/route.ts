@@ -9,7 +9,25 @@ export async function GET(
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية الوصول للكورس
+    const courseAccess = await prisma.course.findUnique({
+      where: { id: courseId },
+      select: { userId: true },
+    });
+
+    if (!courseAccess) {
+      return new NextResponse("Course not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      courseAccess.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -17,6 +35,15 @@ export async function GET(
       prisma.course.findUnique({
         where: {
           id: courseId,
+        },
+        include: {
+          User: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
         },
       }),
       prisma.chapter.findMany({

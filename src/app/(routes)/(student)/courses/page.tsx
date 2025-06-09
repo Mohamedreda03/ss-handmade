@@ -26,6 +26,12 @@ interface Course {
   createdAt: string;
   updatedAt: string;
   isPublished: boolean;
+  User?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
 // تعريف نوع البيانات للاشتراك

@@ -27,10 +27,10 @@ export async function getSuccessStories(
     // Ensure limit is not more than 3
     const actualLimit = Math.min(limit, 3);
 
-    const query: any = {
+    let query: any = {
       where: {
         status: "APPROVED",
-        isFeature: featured, // Default to fetching featured stories
+        isFeature: featured, // Try to fetch featured stories first
       },
       select: {
         id: true,
@@ -47,7 +47,16 @@ export async function getSuccessStories(
       take: actualLimit,
     };
 
-    const stories = await db.successStory.findMany(query);
+    let stories = await db.successStory.findMany(query);
+
+    // If no featured stories found and featured was requested, fallback to any approved stories
+    if (stories.length === 0 && featured) {
+      console.log(
+        "[GET_SUCCESS_STORIES] No featured stories found, falling back to approved stories"
+      );
+      query.where.isFeature = undefined; // Remove the isFeature filter
+      stories = await db.successStory.findMany(query);
+    }
 
     // Transform the stories to match the SuccessStory interface
     return stories.map((story) => ({

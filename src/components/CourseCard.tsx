@@ -40,9 +40,17 @@ export default function CourseCard({
           </div>
         ) : (
           <div className="relative w-full h-[300px] bg-slate-100 dark:bg-slate-800 rounded" />
-        )}
+        )}{" "}
         <div className="flex justify-between gap-2 mt-3 mb-2 border-b border-secondary pb-2">
           <h3 className="md:text-2xl text-lg flex-[1.8]">{course?.title}</h3>
+          {course?.User?.role === "CONSTRUCTOR" && (
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs">بواسطة:</span>
+              <span className="font-medium text-primary">
+                {course?.User?.name}
+              </span>
+            </div>
+          )}
         </div>
         {/* <p>{course.description}</p> */}
         <div

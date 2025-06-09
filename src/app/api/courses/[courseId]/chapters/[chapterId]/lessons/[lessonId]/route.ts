@@ -14,7 +14,33 @@ export async function PATCH(
     let body = await req.json();
 
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية تعديل الدرس
+    const lessonAccess = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        chapter: {
+          include: {
+            course: {
+              select: { userId: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lessonAccess) {
+      return new NextResponse("Lesson not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      lessonAccess.chapter.course.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -40,7 +66,33 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية حذف الدرس
+    const lessonAccess = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        chapter: {
+          include: {
+            course: {
+              select: { userId: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lessonAccess) {
+      return new NextResponse("Lesson not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      lessonAccess.chapter.course.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -118,12 +170,39 @@ export async function DELETE(
 
 export async function GET(
   req: NextRequest,
-  { params: { lessonId } }: { params: { lessonId: string } }
+  {
+    params: { lessonId, courseId },
+  }: { params: { lessonId: string; courseId: string } }
 ) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // For CONSTRUCTOR, verify ownership of the course/lesson
+    if (session.user.role === "CONSTRUCTOR") {
+      const lessonAccess = await prisma.lesson.findUnique({
+        where: { id: lessonId },
+        include: {
+          chapter: {
+            include: {
+              course: {
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (
+        !lessonAccess ||
+        lessonAccess.chapter.course.userId !== session.user.id
+      ) {
+        return new NextResponse("Unauthorized access to this lesson", {
+          status: 401,
+        });
+      }
     }
 
     const data = await prisma.lesson.findUnique({

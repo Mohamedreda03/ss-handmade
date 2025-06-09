@@ -7,13 +7,35 @@ import { join } from "path";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { chapterId: string } }
+  { params }: { params: { chapterId: string; courseId: string } }
 ) {
   try {
     const body = await req.json();
 
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية تعديل الفصل
+    const chapterAccess = await prisma.chapter.findUnique({
+      where: { id: params.chapterId },
+      include: {
+        course: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!chapterAccess) {
+      return new NextResponse("Chapter not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      chapterAccess.course.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -39,7 +61,29 @@ export async function DELETE(
 ) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // التحقق من صلاحية حذف الفصل
+    const chapterAccess = await prisma.chapter.findUnique({
+      where: { id: chapterId },
+      include: {
+        course: {
+          select: { userId: true },
+        },
+      },
+    });
+
+    if (!chapterAccess) {
+      return new NextResponse("Chapter not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      chapterAccess.course.userId !== session.user.id
+    ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -129,12 +173,28 @@ export async function DELETE(
 
 export async function GET(
   req: NextRequest,
-  { params: { chapterId } }: { params: { chapterId: string } }
+  {
+    params: { chapterId, courseId },
+  }: { params: { chapterId: string; courseId: string } }
 ) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // For CONSTRUCTOR, verify ownership of the course
+    if (session.user.role === "CONSTRUCTOR") {
+      const courseAccess = await prisma.course.findUnique({
+        where: { id: courseId },
+        select: { userId: true },
+      });
+
+      if (!courseAccess || courseAccess.userId !== session.user.id) {
+        return new NextResponse("Unauthorized access to this course", {
+          status: 401,
+        });
+      }
     }
 
     const chapter = await prisma.chapter.findFirst({

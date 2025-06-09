@@ -7,8 +7,35 @@ export async function PATCH(req: NextRequest) {
     let list = await req.json();
 
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // إذا كان Constructor، يجب التحقق من ملكية الدروس
+    if (session.user.role === "CONSTRUCTOR") {
+      // الحصول على معرف الدرس الأول للتحقق من الملكية
+      const firstLessonId = list[0]?.id;
+      if (!firstLessonId) {
+        return new NextResponse("No lessons provided", { status: 400 });
+      }
+
+      // التحقق من ملكية الدرس
+      const lessonAccess = await prisma.lesson.findUnique({
+        where: { id: firstLessonId },
+        include: {
+          chapter: {
+            include: {
+              course: {
+                select: { userId: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (!lessonAccess || lessonAccess.chapter.course.userId !== session.user.id) {
+        return new NextResponse("Unauthorized - You don't own this course", { status: 401 });
+      }
     }
 
     for (let item of list) {

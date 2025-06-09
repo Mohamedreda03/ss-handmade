@@ -38,13 +38,14 @@ export default function NewCoursePage() {
       name: "",
     },
   });
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isLoading: isMutating } = useMutation({
     mutationFn: async (data: z.infer<typeof FormSchema>) => {
       const res = await axios.post("/api/courses", data);
-      router.push(`/admin/courses/${res.data.data.id}`);
+      return res.data.data;
     },
-    onSuccess: () => {
+    onSuccess: async (courseData) => {
       queryClient.invalidateQueries(["courses"]);
       toast({
         description: (
@@ -54,12 +55,28 @@ export default function NewCoursePage() {
           </div>
         ),
       });
+
+      // بدء حالة التوجيه
+      setIsNavigating(true);
+
+      // التوجيه إلى صفحة الكورس
+      router.push(`/admin/courses/${courseData.id}`);
+    },
+    onError: () => {
+      // إنهاء حالة التحميل عند حدوث خطأ
+      setIsNavigating(false);
     },
   });
 
+  // الحالة الإجمالية للتحميل
+  const isLoading = isMutating || isNavigating;
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     await mutateAsync(data);
   }
+
+  const handleCancel = () => {
+    router.back();
+  };
   return (
     <div className="p-5 min-h-[calc(100vh-300px)] flex items-center justify-center">
       <div className="max-w-screen-lg w-full">
@@ -77,9 +94,12 @@ export default function NewCoursePage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  {/* <FormLabel className="text-lg">عنوان الكورس</FormLabel> */}
                   <FormControl>
-                    <Input placeholder="اسم الكورس" {...field} />
+                    <Input
+                      disabled={isLoading}
+                      placeholder="اسم الكورس"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     يجب أن يكون العنوان مميز ويحتوي على معلومات عن الكورس
@@ -87,13 +107,21 @@ export default function NewCoursePage() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />{" "}
             <Button disabled={isLoading} type="submit" className="ml-4">
-              إنشاء الكورس
+              {isMutating
+                ? "جاري الإنشاء..."
+                : isNavigating
+                ? "جاري التوجيه..."
+                : "إنشاء الكورس"}
             </Button>
-
-            <Button disabled={isLoading} type="submit" variant="outline">
-              الغاء
+            <Button
+              disabled={isLoading}
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+            >
+              إلغاء
             </Button>
           </form>
         </Form>

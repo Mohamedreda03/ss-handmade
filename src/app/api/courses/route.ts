@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
     const course = await prisma.course.create({
       data: {
         title: name,
+        userId: session.user.id, // ربط الكورس بمنشئه
       },
     });
 
@@ -27,11 +28,42 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const courses = await prisma.course.findMany();
+    let courses;
+
+    if (session.user.role === "ADMIN") {
+      // Admin يرى جميع الكورسات
+      courses = await prisma.course.findMany({
+        include: {
+          User: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+    } else if (session.user.role === "CONSTRUCTOR") {
+      // Constructor يرى كورساته فقط
+      courses = await prisma.course.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        include: {
+          User: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+    }
 
     return NextResponse.json({ data: courses });
   } catch (error) {

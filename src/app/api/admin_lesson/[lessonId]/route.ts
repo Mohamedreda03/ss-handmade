@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
     const course = await prisma.course.create({
       data: {
         title: name,
+        userId: session.user.id, // ربط الكورس بمنشئه
       },
     });
 
@@ -31,7 +32,7 @@ export async function GET(
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -45,8 +46,27 @@ export async function GET(
             answers: true,
           },
         },
+        chapter: {
+          include: {
+            course: {
+              select: { userId: true },
+            },
+          },
+        },
       },
     });
+
+    if (!lesson) {
+      return new NextResponse("Lesson not found", { status: 404 });
+    }
+
+    // إذا كان constructor، يجب أن يكون مالك الكورس
+    if (
+      session.user.role === "CONSTRUCTOR" &&
+      lesson.chapter.course.userId !== session.user.id
+    ) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
 
     let requiredFields: any[] = [];
 

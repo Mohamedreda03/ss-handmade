@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -18,13 +18,30 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
+    let whereClause = {};
+
+    // إذا كان المستخدم constructor، فلتر الكورسات بناءً على userId
+    if (session.user.role === "CONSTRUCTOR") {
+      whereClause = {
+        userId: session.user.id,
+      };
+    }
+    // إذا كان admin، فلا نضع أي فلتر (يرى جميع الكورسات)
+
     const [courses, totalCourses] = await Promise.all([
       prisma.course.findMany({
+        where: whereClause,
         select: {
           id: true,
           title: true,
           price: true,
-
+          User: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
           _count: {
             select: {
               Subscription: true,
@@ -34,7 +51,9 @@ export async function GET(req: NextRequest) {
         skip,
         take,
       }),
-      prisma.course.count(),
+      prisma.course.count({
+        where: whereClause,
+      }),
     ]);
 
     const totalPages = Math.ceil(totalCourses / pageSize);

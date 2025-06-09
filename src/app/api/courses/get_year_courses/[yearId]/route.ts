@@ -4,9 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params: { yearId } }: { params: { yearId: string } }
+) {
   try {
     const session = await auth();
+    const isUserAuth = session ? true : false;
+
     const [courses, subscriptions] = await Promise.all([
       prisma.course.findMany({
         where: {
@@ -30,9 +35,9 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    return NextResponse.json({ courses, subscriptions });
+    return NextResponse.json({ courses, subscriptions, isUserAuth });
   } catch (error) {
-    console.log(error);
-    return new NextResponse("internal server error", { status: 500 });
+    console.log("GET YEAR COURSES ERROR", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

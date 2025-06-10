@@ -12,28 +12,24 @@ import { prisma } from "./prisma";
 declare module "next-auth" {
   interface Session {
     user: {
-      id: number;
+      id: string;
       name: string;
       email: string;
-      role: Role;
+      role: string;
       device_id?: string;
     } & DefaultSession["user"];
   }
 }
 
-enum Role {
-  STUDENT = "STUDENT",
-  ADMIN = "ADMIN",
-  CONSTRUCTOR = "CONSTRUCTOR",
-}
-
 declare module "next-auth/jwt" {
   interface JWT {
-    id: number;
-    name: string;
-    email: string;
-    role: Role;
-    device_id?: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      device_id?: string;
+    };
   }
 }
 
@@ -52,108 +48,154 @@ export default {
     }),
     Credentials({
       async authorize(credentials: any) {
-        const { email, password } = credentials;
+        try {
+          const { email, password } = credentials;
 
-        const user = await prisma.user.findFirst({
-          where: {
-            email,
-          },
-          include: {
-            contractorProfile: true, // تضمين بيانات ملف كونستركتور
-          },
-        });
+          const user = await prisma.user.findFirst({
+            where: {
+              email,
+            },
+            include: {
+              contractorProfile: true,
+            },
+          });
 
-        if (!user) {
-          return null;
+          if (!user) {
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            password,
+            user.password!
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          // التحقق من حالة كونستركتور إذا كان المستخدم كونستركتور
+          if (user.role === "CONSTRUCTOR") {
+            if (!user.contractorProfile) {
+              throw new Error("لم يتم العثور على ملف كونستركتور الخاص بك");
+            }
+
+            const contractorStatus = user.contractorProfile.status;
+            if (contractorStatus === "PENDING") {
+              throw new Error("حسابك ككونستركتور لا زال تحت المراجعة");
+            }
+
+            if (contractorStatus === "REJECTED") {
+              throw new Error("تم رفض طلب التسجيل ككونستركتور");
+            }
+
+            if (contractorStatus === "SUSPENDED") {
+              throw new Error("تم تعليق حسابك ككونستركتور مؤقتاً");
+            }
+
+            // السماح بالدخول فقط للكونستركتور المقبول
+            if (contractorStatus !== "APPROVED") {
+              throw new Error("حالة الحساب غير صالحة");
+            }
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Authorization error:", error);
+          throw error;
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password!);
-
-        if (!isPasswordValid) {
-          return null;
-        } // التحقق من حالة كونستركتور إذا كان المستخدم كونستركتور
-        if (user.role === "CONSTRUCTOR") {
-          if (!user.contractorProfile) {
-            throw new Error("لم يتم العثور على ملف كونستركتور الخاص بك");
-          }
-
-          const contractorStatus = user.contractorProfile.status;
-          if (contractorStatus === "PENDING") {
-            throw new Error("حسابك ككونستركتور لا زال تحت المراجعة");
-          }
-
-          if (contractorStatus === "REJECTED") {
-            throw new Error("تم رفض طلب التسجيل ككونستركتور");
-          }
-
-          if (contractorStatus === "SUSPENDED") {
-            throw new Error("تم تعليق حسابك ككونستركتور مؤقتاً");
-          }
-
-          // السماح بالدخول فقط للكونستركتور المقبول
-          if (contractorStatus !== "APPROVED") {
-            throw new Error("حالة الحساب غير صالحة");
-          }
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      if (user) {
-        console.log("JWT callback - New login:", {
-          provider: account?.provider,
-          email: user.email,
-        });
-        // For Google authentication
-        if (account && account.provider === "google") {
-          // Check if user exists in the database
-          const existingUser = await prisma.user.findFirst({
-            where: {
-              email: user.email!,
-            },
+      try {
+        if (user) {
+          console.log("JWT callback - New login:", {
+            provider: account?.provider,
+            email: user.email,
           });
-          if (!existingUser) {
-            console.log("Creating new Google user");
-            // Create a new user if they don't exist
-            const newUser = await prisma.user.create({
-              data: {
+
+          // For Google authentication
+          if (account && account.provider === "google") {
+            // Check if user exists in the database
+            const existingUser = await prisma.user.findFirst({
+              where: {
                 email: user.email!,
-                name: user.name!,
-                role: "STUDENT",
               },
             });
 
-            const deviceId = uuidv4();
+            if (!existingUser) {
+              console.log("Creating new Google user");
+              // Create a new user if they don't exist
+              const newUser = await prisma.user.create({
+                data: {
+                  email: user.email!,
+                  name: user.name!,
+                  role: "STUDENT",
+                },
+              });
 
-            await prisma.session.create({
-              data: {
-                userId: newUser.id,
-                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              const deviceId = uuidv4();
+
+              await prisma.session.create({
+                data: {
+                  userId: newUser.id,
+                  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                  device_id: deviceId,
+                },
+              });
+
+              token.user = {
+                id: newUser.id,
+                name: newUser.name || "",
+                email: newUser.email || "",
+                role: newUser.role,
                 device_id: deviceId,
+              };
+            } else {
+              console.log("Existing Google user, creating new session");
+              // User exists, delete old sessions and create new one
+              await prisma.session.deleteMany({
+                where: {
+                  userId: existingUser.id,
+                },
+              });
+
+              const deviceId = uuidv4();
+
+              await prisma.session.create({
+                data: {
+                  userId: existingUser.id,
+                  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                  device_id: deviceId,
+                },
+              });
+
+              token.user = {
+                id: existingUser.id,
+                name: existingUser.name || "",
+                email: existingUser.email || "",
+                role: existingUser.role,
+                device_id: deviceId,
+              };
+            }
+          } else {
+            console.log("Credentials login");
+            // Regular credentials login
+            const userData = await prisma.user.findUnique({
+              where: {
+                id: user.id,
               },
             });
 
-            token.user = {
-              id: newUser.id,
-              name: newUser.name,
-              email: newUser.email,
-              role: newUser.role,
-              device_id: deviceId,
-            };
-          } else {
-            console.log("Existing Google user, creating new session");
-            // User exists, delete old sessions and create new one
             await prisma.session.deleteMany({
               where: {
-                userId: existingUser.id,
+                userId: user.id,
               },
             });
 
@@ -161,61 +203,39 @@ export default {
 
             await prisma.session.create({
               data: {
-                userId: existingUser.id,
+                userId: user.id!,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 device_id: deviceId,
               },
             });
-
             token.user = {
-              id: existingUser.id,
-              name: existingUser.name,
-              email: existingUser.email,
-              role: existingUser.role,
+              id: user.id!,
+              name: user.name || "",
+              email: user.email || "",
+              role: userData?.role || "STUDENT",
               device_id: deviceId,
             };
           }
-        } else {
-          console.log("Credentials login");
-          // Regular credentials login
-          const userData = await prisma.user.findUnique({
-            where: {
-              id: user.id,
-            },
-          });
-
-          await prisma.session.deleteMany({
-            where: {
-              userId: user.id,
-            },
-          });
-
-          const deviceId = uuidv4();
-
-          await prisma.session.create({
-            data: {
-              userId: user.id!,
-              expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              device_id: deviceId,
-            },
-          });
-
-          token.user = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: userData?.role,
-            device_id: deviceId,
-          };
         }
-      }
 
-      return token;
+        return token;
+      } catch (error) {
+        console.error("JWT callback error:", error);
+        // Return token without modifications in case of error
+        return token;
+      }
     },
 
     async session({ session, token }) {
-      session.user = token.user as any;
-      return session;
+      try {
+        if (token.user) {
+          session.user = token.user as any;
+        }
+        return session;
+      } catch (error) {
+        console.error("Session callback error:", error);
+        return session;
+      }
     },
   },
   pages: {

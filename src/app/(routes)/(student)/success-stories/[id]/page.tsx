@@ -127,18 +127,11 @@ export default function SuccessStoryDetailsPage({
 
               <div className="prose prose-lg max-w-none mb-8">
                 <p className="whitespace-pre-wrap">{story.story}</p>
-              </div>
-
-              <div className="border-t pt-4 flex flex-col sm:flex-row sm:items-center justify-between text-gray-500">
+              </div>              <div className="border-t pt-4 flex flex-col sm:flex-row sm:items-center justify-between text-gray-500">
                 <div className="flex items-center gap-2 mb-2 sm:mb-0">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden">
                     <Image
-                      src={
-                        story.user?.image?.startsWith("/uploads")
-                          ? story.user?.image
-                          : story.user?.image ||
-                            `/images/success/default-user.jpg`
-                      }
+                      src={`/images/success/default-user.jpg`}
                       alt={story.user?.name || "المستخدم"}
                       layout="fill"
                       objectFit="cover"

@@ -27,14 +27,12 @@ export async function GET(req: NextRequest) {
     } // Get contractors with pagination
     const [contractors, totalContractors, statusStats] = await Promise.all([
       prisma.contractorProfile.findMany({
-        where: whereClause,
-        include: {
+        where: whereClause,        include: {
           user: {
             select: {
               id: true,
               name: true,
               email: true,
-              image: true,
               createdAt: true,
             },
           },

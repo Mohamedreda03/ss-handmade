@@ -92,7 +92,7 @@ interface SuccessStory {
   createdAt: string;
   user: {
     name?: string;
-    image?: string;
+    email?: string;
   };
 }
 

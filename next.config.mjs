@@ -16,6 +16,11 @@ const nextConfig = {
       },
     ],
   },
+  // تحسينات للأداء والـ Server-Side Rendering
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client"],
+    optimizeCss: true,
+  },
   // إضافة تكوين للويب باك لدعم ملفات الخطوط بشكل أفضل
   webpack(config) {
     config.module.rules.push({
@@ -25,6 +30,9 @@ const nextConfig = {
     });
     return config;
   },
+  // تحسين الـ Build للإنتاج
+  productionBrowserSourceMaps: false,
+  poweredByHeader: false,
 };
 
 export default nextConfig;

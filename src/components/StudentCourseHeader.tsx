@@ -28,7 +28,9 @@ export default function StudentCourseHeader({
             }}
           />
 
-          <div className="flex md:items-center gap-6 flex-col md:flex-row mt-5">            <div className="flex items-center gap-2 flex-col md:flex-row">
+          <div className="flex md:items-center gap-6 flex-col md:flex-row mt-5">
+            {" "}
+            <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
                 <FolderPlus
                   size={16}
@@ -42,7 +44,6 @@ export default function StudentCourseHeader({
                 })}
               </span>
             </div>
-
             <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
                 <RefreshCcw size={16} className="text-secondary" />

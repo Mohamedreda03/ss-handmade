@@ -75,7 +75,6 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [params.productId]);
 

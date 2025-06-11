@@ -51,7 +51,7 @@ export default function EditSuccessStoryPage({
     } else if (status === "authenticated") {
       fetchStory();
     }
-  }, [status, router, params.id]);
+  }, [status, router, params.id, fetchStory]);
 
   if (status === "loading" || isLoading) {
     return (

@@ -65,7 +65,9 @@ export default function SubscriptionsCharts() {
     queryFn: async () => {
       console.log("🔄 Fetching subscription stats...");
       try {
-        const { data } = await axios.get("/api/dashboard/subscription_stats");
+        const { data } = await axios.get("/api/dashboard/subscription_stats", {
+          timeout: 25000, // 25 seconds timeout
+        });
         console.log("✅ Subscription stats received:", data);
         return data;
       } catch (error) {
@@ -74,8 +76,10 @@ export default function SubscriptionsCharts() {
       }
     },
     staleTime: 60 * 1000 * 5, // 5 دقائق حتى إعادة الجلب
-    retry: 3,
-    retryDelay: 1000,
+    retry: 2,
+    retryDelay: 2000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
   const processedData = useMemo(() => {
     // إذا لم تكن هناك بيانات، أنشئ بيانات فارغة للأشهر الـ 12 الماضية

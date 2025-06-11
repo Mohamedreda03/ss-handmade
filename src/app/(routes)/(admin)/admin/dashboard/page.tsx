@@ -2,6 +2,7 @@
 
 import SubscriptionsCharts from "@/components/admin_dashboard/subcriptions/SubscriptionsCharts";
 import CoursesDataTable from "@/components/admin_dashboard/tables/CoursesDataTable";
+import ApiDiagnostics from "@/components/admin_dashboard/ApiDiagnostics";
 import Loading from "@/components/Loading";
 import axios from "axios";
 import { useQuery } from "react-query";
@@ -11,10 +12,16 @@ export default function Page() {
     queryKey: ["users", "courses"],
     queryFn: async () => {
       const data = await axios
-        .get("/api/dashboard/dashboard_data")
+        .get("/api/dashboard/dashboard_data", {
+          timeout: 25000, // 25 seconds timeout
+        })
         .then((res) => res.data);
       return data;
     },
+    retry: 2,
+    retryDelay: 2000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
   if (isLoading) {
     return <Loading className="h-[300px]" />;
@@ -69,11 +76,14 @@ export default function Page() {
           <h3 className="mb-4 text-2xl border-b-2 border-blue-500">
             بيانات الكورسات
           </h3>
-        </div>
+        </div>{" "}
         <div>
           <CoursesDataTable />
         </div>
       </div>
+
+      {/* API Diagnostics Component */}
+      <ApiDiagnostics />
     </div>
   );
 }

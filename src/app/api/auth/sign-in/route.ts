@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         email: body.email,
       },
       include: {
-        contractorProfile: true, // تضمين بيانات ملف كونستركتور
+        contractorProfile: true, // تضمين بيانات ملف مُنسق
       },
     });
 
@@ -31,13 +31,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // التحقق من حالة الكونستركتور إذا كان المستخدم كونستركتور
+    // التحقق من حالة المُنسق إذا كان المستخدم مُنسق
     if (user.role === "CONSTRUCTOR") {
       if (!user.contractorProfile) {
         return NextResponse.json({
           error: true,
           message:
-            "لم يتم العثور على ملف الكونستركتور الخاص بك. يرجى التواصل مع الإدارة.",
+            "لم يتم العثور على ملف المُنسق الخاص بك. يرجى التواصل مع الإدارة.",
           contractorStatus: "NO_PROFILE",
         });
       }
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "حسابك ككونستركتور لا زال تحت المراجعة. يرجى المحاولة مرة أخرى لاحقاً.",
+            "حسابك كمُنسق لا زال تحت المراجعة. يرجى المحاولة مرة أخرى لاحقاً.",
           contractorStatus: "PENDING",
         });
       }
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "تم رفض طلب التسجيل ككونستركتور. يرجى مراجعة بياناتك وإعادة التقديم أو التواصل مع الإدارة.",
+            "تم رفض طلب التسجيل كمُنسق. يرجى مراجعة بياناتك وإعادة التقديم أو التواصل مع الإدارة.",
           contractorStatus: "REJECTED",
         });
       }
@@ -65,12 +65,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           error: true,
           message:
-            "تم تعليق حسابك ككونستركتور مؤقتاً. يرجى التواصل مع الإدارة لمزيد من التفاصيل.",
+            "تم تعليق حسابك كمُنسق مؤقتاً. يرجى التواصل مع الإدارة لمزيد من التفاصيل.",
           contractorStatus: "SUSPENDED",
         });
       }
 
-      // إذا كان الكونستركتور مقبول (APPROVED)، يمكنه تسجيل الدخول
+      // إذا كان المُنسق مقبول (APPROVED)، يمكنه تسجيل الدخول
       if (contractorStatus !== "APPROVED") {
         return NextResponse.json({
           error: true,

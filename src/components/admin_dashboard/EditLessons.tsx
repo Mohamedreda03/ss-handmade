@@ -216,10 +216,11 @@ export default function EditLessons({
                           <SelectTrigger>
                             <SelectValue placeholder="أختر نوع الدرس" />
                           </SelectTrigger>
-                        </FormControl>
+                        </FormControl>{" "}
                         <SelectContent>
                           <SelectItem value="video">فيديو</SelectItem>
                           <SelectItem value="file">ملف</SelectItem>
+                          <SelectItem value="assignment">مهمة</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>

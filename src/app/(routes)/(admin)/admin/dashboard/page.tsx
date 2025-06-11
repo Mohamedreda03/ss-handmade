@@ -7,7 +7,7 @@ import axios from "axios";
 import { useQuery } from "react-query";
 
 export default function Page() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ["users", "courses"],
     queryFn: async () => {
       const data = await axios
@@ -16,9 +16,24 @@ export default function Page() {
       return data;
     },
   });
-
   if (isLoading) {
     return <Loading className="h-[300px]" />;
+  }
+
+  if (isError) {
+    console.error("❌ Error loading dashboard data:", error);
+    return (
+      <div className="p-5">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            ⚠️ خطأ في تحميل البيانات
+          </h2>
+          <p className="text-muted-foreground">
+            يرجى التحقق من اتصال قاعدة البيانات والمحاولة مرة أخرى
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!data) {

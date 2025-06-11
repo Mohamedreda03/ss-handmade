@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "src/app/api/dashboard/dashboard_data/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/dashboard/subscription_stats/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "crons": []
+}

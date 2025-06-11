@@ -110,31 +110,31 @@ export default function CoursePage() {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6">
+      {" "}
       {/* رأس الصفحة مع خلفية زخرفية */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative rounded-xl bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-teal-500/10 p-8 mb-10"
+        className="relative rounded-xl bg-gradient-to-br from-primary/15 via-secondary/10 to-primary/20 p-8 mb-10 border border-primary/20"
       >
-        <div className="absolute inset-0 opacity-10 bg-pattern-dots"></div>
+        <div className="absolute inset-0 opacity-15 bg-pattern-dots"></div>
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">
+              <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 استكشف دورات الحرف اليدوية
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground/80">
                 اكتسب مهارات جديدة واصنع منتجاتك الخاصة مع دوراتنا التدريبية
               </p>
             </div>
-            <div className="shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-full">
+            <div className="shrink-0 p-4 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/20">
               <BookOpen className="h-16 w-16 text-primary" />
             </div>
           </div>
         </div>
       </motion.div>
-
       {/* قسم الفلاتر */}
       <div className="bg-card rounded-lg shadow p-4 mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -176,7 +176,6 @@ export default function CoursePage() {
           </Select>
         </div>
       </div>
-
       {/* عرض الكورسات */}
       <div className="min-h-[600px]">
         {isLoading ? (

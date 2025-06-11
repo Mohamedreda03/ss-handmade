@@ -328,7 +328,7 @@ export default function SignUp() {
                   style={{ backgroundColor: "transparent" }}
                 >
                   <Briefcase className="w-5 h-5" />
-                  كونستركتور
+                  مُنسق
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="user" className="mt-0">
@@ -433,7 +433,7 @@ export default function SignUp() {
                       <div className="p-2 bg-white/20 rounded-full">
                         <Briefcase className="w-6 h-6" />
                       </div>
-                      تسجيل كونستركتور
+                      تسجيل مُنسق
                     </CardTitle>
                     <CardDescription className="text-[#F4F4F0] text-lg mt-2">
                       للحرفيين والمصنعين الذين يريدون بيع منتجاتهم على المنصة
@@ -720,7 +720,7 @@ export default function SignUp() {
                           ) : (
                             <>
                               <Briefcase className="ml-3 h-7 w-7" />
-                              تقديم طلب تسجيل الكونستركتور
+                              تقديم طلب تسجيل المُنسق
                             </>
                           )}
                         </Button>

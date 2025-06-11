@@ -111,7 +111,7 @@ export default function UsersTable() {
                   >
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      <span>الإيميل</span>
+                      <span>ايميل</span>
                     </div>
                   </button>
                 </div>
@@ -170,7 +170,7 @@ export default function UsersTable() {
                 البحث في:{" "}
                 <span className="font-medium">
                   {searchType === "name"
-                    ? "الأسماء"
+                    ? "الاسماء"
                     : "عناوين البريد الإلكتروني"}
                 </span>
               </div>
@@ -186,7 +186,7 @@ export default function UsersTable() {
                 <TableHead className="text-center">
                   <div className="flex items-center justify-center gap-2">
                     <UserIcon className="h-4 w-4" />
-                    <span>أسم المستخدم</span>
+                    <span>اسم المستخدم</span>
                   </div>
                 </TableHead>
                 <TableHead className="text-center">

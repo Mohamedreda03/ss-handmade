@@ -57,11 +57,11 @@ export async function POST(req: Request) {
     }
 
     const { productItems, totalAmount } = await req.json();
-
     const order = await prisma.order.create({
       data: {
         userId: session.user.id,
         totalAmount,
+        status: "PENDING", // الحالة الافتراضية قيد الانتظار
         orderItems: {
           createMany: {
             data: productItems.map((item: any) => ({

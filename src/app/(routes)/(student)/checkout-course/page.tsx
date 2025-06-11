@@ -136,14 +136,27 @@ export default function CheckoutCoursePage() {
     try {
       setApplyingCoupon(true);
       setCouponMessage(null);
-
       const response = await axios.patch("/api/coupons", {
         code: couponCode,
         amount: course?.price,
-        validateOnly: true, // دائماً نضيف هذا المعامل للتحقق من صلاحية الكوبون فقط دون تفعيله
+        validateOnly: true, // للتحقق من صلاحية الكوبون فقط دون تفعيله
+        itemTypes: { hasProducts: false, hasCourses: true }, // إضافة معلومات نوع العناصر
       });
-
       if (response.data.success) {
+        // التحقق من نوع الكوبون
+        const { couponType } = response.data;
+
+        // إذا كان الكوبون للمنتجات فقط، أظهر رسالة خطأ
+        if (couponType === "product") {
+          setCouponMessage({
+            type: "error",
+            message: "هذا الكوبون صالح للمنتجات فقط وليس للكورسات",
+          });
+          setDiscount(0);
+          setCouponId(null);
+          return;
+        }
+
         // استخدام قيمة الخصم التي تأتي من الخادم
         setDiscount(response.data.discount);
         setCouponId(response.data.couponId);

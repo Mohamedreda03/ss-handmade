@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       {searchKey && (
-        <div className="flex items-center py-4">
+        <div className="flex items-center py-4 mr-5">
           <Input
             placeholder={searchPlaceholder}
             value={
@@ -73,15 +73,22 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
         </div>
-      )}
-      <div className="rounded-md border">
+      )}{" "}
+      <div className="rounded-md border-0">
         <Table className="w-full">
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="border-b hover:bg-transparent"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="p-0">
+                    <TableHead
+                      key={header.id}
+                      className="h-14 px-4 text-center font-semibold text-muted-foreground border-l last:border-l-0"
+                      style={{ width: header.column.columnDef.size || "auto" }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -100,9 +107,14 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="border-b hover:bg-muted/30 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="px-4 py-4 text-center border-l last:border-l-0"
+                      style={{ width: cell.column.columnDef.size || "auto" }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -115,7 +127,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-muted-foreground"
                 >
                   لا توجد بيانات متاحة
                 </TableCell>
@@ -124,7 +136,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>{" "}
-      <div className="flex items-center gap-2 space-x-2 py-4">
+      <div className="flex items-center gap-2 space-x-2 py-4 mr-5">
         <Button
           variant="outline"
           size="sm"

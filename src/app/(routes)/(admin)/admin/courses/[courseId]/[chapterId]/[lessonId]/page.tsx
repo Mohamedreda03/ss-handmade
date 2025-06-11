@@ -5,6 +5,7 @@ import DeleteAlert from "@/components/admin_dashboard/DeleteAlert";
 import EditLessonTitle from "@/components/admin_dashboard/EditLessonTitle";
 import IsPublishedButton from "@/components/admin_dashboard/IsPublishedButton";
 import IsLessonFree from "@/components/admin_dashboard/lessons/IsLessonFree";
+import LessonAssignment from "@/components/admin_dashboard/lessons/LessonAssignment";
 import UploadVideo from "@/components/admin_dashboard/UploadVideo";
 import Loading from "@/components/Loading";
 import axios from "axios";
@@ -83,23 +84,30 @@ export default function LessonPage({
             />
           </div>
           <div className="flex flex-col gap-5 md:flex-1">
+            {" "}
             {data && data?.lesson?.type === "video" && (
               <UploadVideo
                 courseId={courseId}
                 chapterId={chapterId}
                 lesson={data?.lesson}
                 video={data?.lesson.videoUrl!}
-                lessonVideoType={data?.lesson.video_type!}
                 videoId={data?.lesson.videoId!}
               />
             )}
-
             {data && data?.lesson?.type === "file" && (
               <AddFile
                 lessonId={lessonId}
                 fileUrl={data?.lesson.fileUrl!}
                 courseId={courseId}
                 chapterId={chapterId}
+              />
+            )}
+            {data && data?.lesson?.type === "assignment" && (
+              <LessonAssignment
+                courseId={courseId}
+                chapterId={chapterId}
+                lessonId={lessonId}
+                lesson={data?.lesson}
               />
             )}
           </div>

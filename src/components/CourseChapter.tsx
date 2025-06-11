@@ -23,21 +23,21 @@ export default function CourseChapter({
   isUserAdmin: boolean;
 }) {
   const lessons = chapter.Lesson;
-
   return (
     <AccordionItem
       value={chapter?.id}
-      className="border rounded-lg shadow-md md:p-5 p-3"
+      className="border border-primary/30 rounded-lg shadow-md md:p-5 p-3 bg-card hover:shadow-lg transition-shadow hover:border-primary/50"
     >
-      <AccordionTrigger className="bg-slate-100 dark:bg-slate-800 md:py-6 px-5 rounded-lg">
+      {" "}
+      <AccordionTrigger className="bg-primary/10 dark:bg-primary/20 md:py-6 px-5 rounded-lg hover:bg-primary/15 dark:hover:bg-primary/25 transition-colors">
         <div className="flex items-center gap-3">
-          <BookOpenText className="text-rose-400 h-8 w-8" />
-          <h3 className="text-xl md:text-2xl font-semibold">
+          <BookOpenText className="text-primary h-8 w-8" />
+          <h3 className="text-xl md:text-2xl font-semibold text-primary">
             {chapter?.title}
           </h3>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="mt-5 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
+      <AccordionContent className="mt-5 bg-accent/30 dark:bg-accent/10 p-4 rounded-lg border border-primary/20">
         <Accordion type="single" collapsible className="w-full space-y-3">
           {lessons?.map((lesson: any) => (
             <ChapterLesson

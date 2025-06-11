@@ -55,7 +55,7 @@ export default function HistoryPage() {
           className="mb-4 flex items-center flex-col sm:flex-row gap-3"
         >
           <Input
-            placeholder="بحث بأسم المستخدم"
+            placeholder="بحث باسم المستخدم"
             className="max-w-[300px]"
             onChange={(e) => setSearchName(e.target.value)}
             disabled={dataLoading}
@@ -76,7 +76,7 @@ export default function HistoryPage() {
         <Table dir="rtl" className="mb-8 border">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-center">أسم المستخدم</TableHead>
+              <TableHead className="text-center">اسم المستخدم</TableHead>
               <TableHead className="text-center">ايمال المستخدم</TableHead>
               <TableHead className="text-center">تاريخ العمليه</TableHead>
 

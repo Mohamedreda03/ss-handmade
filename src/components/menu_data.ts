@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Star,
   HardHat,
+  ClipboardCheck,
 } from "lucide-react";
 
 interface MenuData {
@@ -59,6 +60,7 @@ export const admin_menu_data: MenuData[] = [
     Icon: User2,
     role: ["ADMIN"],
   },
+
   {
     id: 5,
     title: "الكوبونات",
@@ -97,8 +99,16 @@ export const admin_menu_data: MenuData[] = [
   {
     id: 10,
     link: `/admin/contractors`,
-    title: "كونستركتور",
+    title: "مُنسق",
     Icon: HardHat,
     role: ["ADMIN"],
+  },
+
+  {
+    id: 12,
+    link: `/admin/assignments/submissions`,
+    title: "إجابات المهام",
+    Icon: ClipboardCheck,
+    role: ["ADMIN", "CONSTRUCTOR"],
   },
 ];

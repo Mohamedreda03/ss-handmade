@@ -45,7 +45,7 @@ export default function CoursesDataTable() {
       <Table dir="rtl" className="mb-8 border">
         <TableHeader>
           <TableRow>
-            <TableHead className="text-center">أسم الكورس</TableHead>
+            <TableHead className="text-center">اسم الكورس</TableHead>
             <TableHead className="text-center">سعر الكورس</TableHead>
             <TableHead className="text-center">عدد الاشتراكات</TableHead>
           </TableRow>

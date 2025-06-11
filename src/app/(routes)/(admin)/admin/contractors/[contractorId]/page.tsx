@@ -204,10 +204,10 @@ export default function ContractorDetailPage() {
           <CardContent className="text-center p-8">
             <X className="mx-auto h-16 w-16 text-red-500 mb-4" />{" "}
             <h2 className="text-xl font-semibold text-[#3D402C] mb-2">
-              لم يتم العثور على الكونستركتور
+              لم يتم العثور على المُنسق
             </h2>
             <p className="text-[#3D402C]/70 mb-4">
-              الكونستركتور المطلوب غير موجود أو تم حذفه
+              المُنسق المطلوب غير موجود أو تم حذفه
             </p>
             <Button
               onClick={() => router.push("/admin/contractors")}
@@ -229,9 +229,7 @@ export default function ContractorDetailPage() {
       <div className="flex justify-between items-center mb-6">
         {" "}
         <div>
-          <h1 className="text-3xl font-bold text-[#6F7354]">
-            تفاصيل الكونستركتور
-          </h1>
+          <h1 className="text-3xl font-bold text-[#6F7354]">تفاصيل المُنسق</h1>
           <p className="text-[#3D402C]/70 mt-1">
             عرض تفاصيل طلب التسجيل ومراجعته
           </p>
@@ -256,7 +254,7 @@ export default function ContractorDetailPage() {
                 <Avatar className="h-16 w-16 border-2 border-[#6F7354]/20">
                   <AvatarImage
                     src={contractor.user.image || undefined}
-                    alt={contractor.user.name || "كونستركتور"}
+                    alt={contractor.user.name || "مُنسق"}
                   />
                   <AvatarFallback className="bg-[#6F7354] text-white text-lg">
                     {contractor.user.name?.charAt(0)?.toUpperCase() || "م"}
@@ -488,17 +486,17 @@ export default function ContractorDetailPage() {
           <DialogHeader>
             <DialogTitle className="text-[#3D402C]">
               {" "}
-              {reviewAction === "APPROVED" && "تأكيد قبول الكونستركتور"}
-              {reviewAction === "REJECTED" && "تأكيد رفض الكونستركتور"}
-              {reviewAction === "SUSPENDED" && "تأكيد تعليق الكونستركتور"}
+              {reviewAction === "APPROVED" && "تأكيد قبول المُنسق"}
+              {reviewAction === "REJECTED" && "تأكيد رفض المُنسق"}
+              {reviewAction === "SUSPENDED" && "تأكيد تعليق المُنسق"}
             </DialogTitle>
             <DialogDescription className="text-[#3D402C]/70">
               {reviewAction === "APPROVED" &&
-                "سيتم قبول الكونستركتور وتفعيل حسابه للوصول إلى المنصة"}
+                "سيتم قبول المُنسق وتفعيل حسابه للوصول إلى المنصة"}
               {reviewAction === "REJECTED" &&
-                "سيتم رفض طلب الكونستركتور ولن يتمكن من الوصول إلى المنصة"}
+                "سيتم رفض طلب المُنسق ولن يتمكن من الوصول إلى المنصة"}
               {reviewAction === "SUSPENDED" &&
-                "سيتم تعليق حساب الكونستركتور مؤقتاً ومنعه من الوصول"}
+                "سيتم تعليق حساب المُنسق مؤقتاً ومنعه من الوصول"}
             </DialogDescription>{" "}
           </DialogHeader>
           <DialogFooter className="gap-2">

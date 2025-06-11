@@ -16,6 +16,20 @@ export async function GET(
         where: {
           id: lessonId,
         },
+        include: {
+          assignment: {
+            include: {
+              submissions: {
+                where: {
+                  studentId: session?.user.id,
+                },
+                include: {
+                  grade: true,
+                },
+              },
+            },
+          },
+        },
       }),
       prisma.subscription.findFirst({
         where: {

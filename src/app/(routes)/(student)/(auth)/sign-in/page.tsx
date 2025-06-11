@@ -53,7 +53,7 @@ export default function SignIn() {
         })
         .then(async (res: any) => {
           if (res.data.error) {
-            // عرض رسائل مخصصة حسب حالة الكونستركتور
+            // عرض رسائل مخصصة حسب حالة المُنسق
             const contractorStatus = res.data.contractorStatus;
             let description = res.data.message;
             let variant: "destructive" | "default" = "destructive";
@@ -66,7 +66,7 @@ export default function SignIn() {
                     <span className="font-semibold">طلبك قيد المراجعة</span>
                   </div>{" "}
                   <p className="text-sm">
-                    حسابك ككونستركتور لا زال تحت المراجعة من قبل الإدارة. يرجى
+                    حسابك كمُنسق لا زال تحت المراجعة من قبل الإدارة. يرجى
                     المحاولة مرة أخرى لاحقاً.
                   </p>
                 </div>
@@ -80,7 +80,7 @@ export default function SignIn() {
                     <span className="font-semibold">تم رفض الطلب</span>
                   </div>{" "}
                   <p className="text-sm">
-                    تم رفض طلب التسجيل ككونستركتور. يمكنك مراجعة بياناتك وإعادة
+                    تم رفض طلب التسجيل كمُنسق. يمكنك مراجعة بياناتك وإعادة
                     التقديم أو التواصل مع الإدارة للحصول على مزيد من التفاصيل.
                   </p>
                 </div>
@@ -93,8 +93,8 @@ export default function SignIn() {
                     <span className="font-semibold">الحساب معلق مؤقتاً</span>
                   </div>{" "}
                   <p className="text-sm">
-                    تم تعليق حسابك ككونستركتور مؤقتاً. يرجى التواصل مع الإدارة
-                    لمعرفة أسباب التعليق وخطوات إعادة التفعيل.
+                    تم تعليق حسابك كمُنسق مؤقتاً. يرجى التواصل مع الإدارة لمعرفة
+                    أسباب التعليق وخطوات إعادة التفعيل.
                   </p>
                 </div>
               );

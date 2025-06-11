@@ -1,6 +1,7 @@
 "use client";
 
 import CourseHead from "@/components/admin_dashboard/CourseHead";
+import CourseTabs from "@/components/admin_dashboard/CourseTabs";
 import CourseYear from "@/components/admin_dashboard/CourseYear";
 import EditChapters from "@/components/admin_dashboard/EditChapters";
 import EditDesc from "@/components/admin_dashboard/EditDesc";

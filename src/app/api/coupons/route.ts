@@ -227,24 +227,28 @@ export async function PATCH(req: NextRequest) {
 
     if (!session) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Buscar el cupón
+    } // Buscar el cupón
     const coupon = await prisma.coupon.findFirst({
       where: {
         code: body.code,
-        isUsed: false,
-        usedCount: { lt: body.maxUses || 1 },
-        expiresAt: {
-          gt: new Date(),
-        },
+        OR: [
+          { expiresAt: null }, // No expiry date
+          { expiresAt: { gt: new Date() } }, // Not expired yet
+        ],
       },
     });
-
     if (!coupon) {
       return NextResponse.json({
         success: false,
         message: "الكوبون غير صالح أو انتهت صلاحيته",
+      });
+    }
+
+    // Check if coupon has reached maximum usage
+    if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses) {
+      return NextResponse.json({
+        success: false,
+        message: "تم استخدام هذا الكوبون بالحد الأقصى المسموح",
       });
     }
 
@@ -334,8 +338,7 @@ export async function PATCH(req: NextRequest) {
 
         message = "تم الاشتراك بنجاح";
       }
-    }
-    // For product coupon
+    } // For product coupon
     else if (couponType === "product") {
       // Solo validamos el cupón y devolvemos la información del descuento
       const product = await prisma.product.findUnique({
@@ -349,6 +352,9 @@ export async function PATCH(req: NextRequest) {
         });
       }
 
+      // For product coupons, we need to check if the specific product is in the cart
+      // For now, we'll calculate discount based on the product price
+      // The frontend should handle applying discount only to the specific product
       if (coupon.discountType === "PERCENTAGE") {
         discountAmount = (product.price * coupon.value) / 100;
       } else {
@@ -397,7 +403,6 @@ export async function PATCH(req: NextRequest) {
         },
       });
     }
-
     return NextResponse.json({
       success: true,
       message,
@@ -405,7 +410,9 @@ export async function PATCH(req: NextRequest) {
       discountType: coupon.discountType,
       originalValue: coupon.value,
       couponId: coupon.id,
-      couponType, // Añadimos el tipo de cupón para que el front pueda validar
+      couponType, // نوع الكوبون للتحقق في الواجهة الأمامية
+      productId: coupon.productId, // معرف المنتج للكوبونات الخاصة بمنتج محدد
+      courseId: coupon.courseId, // معرف الكورس للكوبونات الخاصة بكورس محدد
     });
   } catch (error) {
     console.log("Apply coupon error:", error);

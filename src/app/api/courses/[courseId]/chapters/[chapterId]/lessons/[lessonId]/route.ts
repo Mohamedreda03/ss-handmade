@@ -1,4 +1,3 @@
-import { deleteVideoFromVimeo } from "@/actions/deleteVideoFromVimeo";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import axios from "axios";
@@ -104,7 +103,6 @@ export async function DELETE(
     if (!lesson) {
       return new NextResponse("Lesson not found", { status: 404 });
     }
-
     if (lesson.fileUrl) {
       const fileName = lesson.fileUrl.split("/").pop() as string;
 
@@ -115,9 +113,7 @@ export async function DELETE(
       }
     }
 
-    if (lesson.videoUrl) {
-      await deleteVideoFromVimeo(lesson.videoUrl);
-    }
+    // Note: videoUrl cleanup removed as we only support YouTube now
 
     await prisma.lesson.delete({
       where: {

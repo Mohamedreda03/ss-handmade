@@ -7,9 +7,10 @@ export default function YearsCourses() {
   return (
     <div className="px-5 py-10 mx-auto max-w-screen-2xl mb-10 flex flex-col gap-10">
       <div className="flex items-center justify-center mb-5">
+        {" "}
         <h2
           className={cn(
-            "text-5xl border-b-2 border-fourth text-first text-center"
+            "text-5xl border-b-2 border-primary text-primary text-center"
           )}
         >
           اختر سنتك الدراسية

@@ -73,26 +73,26 @@ export default {
             return null;
           }
 
-          // التحقق من حالة كونستركتور إذا كان المستخدم كونستركتور
+          // التحقق من حالة مُنسق إذا كان المستخدم مُنسق
           if (user.role === "CONSTRUCTOR") {
             if (!user.contractorProfile) {
-              throw new Error("لم يتم العثور على ملف كونستركتور الخاص بك");
+              throw new Error("لم يتم العثور على ملف مُنسق الخاص بك");
             }
 
             const contractorStatus = user.contractorProfile.status;
             if (contractorStatus === "PENDING") {
-              throw new Error("حسابك ككونستركتور لا زال تحت المراجعة");
+              throw new Error("حسابك كمُنسق لا زال تحت المراجعة");
             }
 
             if (contractorStatus === "REJECTED") {
-              throw new Error("تم رفض طلب التسجيل ككونستركتور");
+              throw new Error("تم رفض طلب التسجيل كمُنسق");
             }
 
             if (contractorStatus === "SUSPENDED") {
-              throw new Error("تم تعليق حسابك ككونستركتور مؤقتاً");
+              throw new Error("تم تعليق حسابك كمُنسق مؤقتاً");
             }
 
-            // السماح بالدخول فقط للكونستركتور المقبول
+            // السماح بالدخول فقط للمُنسق المقبول
             if (contractorStatus !== "APPROVED") {
               throw new Error("حالة الحساب غير صالحة");
             }

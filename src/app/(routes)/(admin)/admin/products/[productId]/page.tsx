@@ -48,7 +48,7 @@ const formSchema = z.object({
   isAvailable: z.boolean().default(true),
 });
 
-const EditProductPage = ({ params }: { params: { id: string } }) => {
+const EditProductPage = ({ params }: { params: { productId: string } }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -58,7 +58,7 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/api/admin/products/${params.id}`);
+        const res = await axios.get(`/api/admin/products/${params.productId}`);
 
         form.reset({
           name: res.data.name,
@@ -77,12 +77,11 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
     };
 
     fetchProduct();
-  }, [params.id]);
+  }, [params.productId]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
@@ -94,9 +93,9 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
         values.imageUrl = url;
       }
 
-      await axios.patch("/api/products", values);
+      await axios.patch(`/api/admin/products/${params.productId}`, values);
       toast.success("تم تعديل المنتج بنجاح");
-      router.push("/my-products");
+      router.push("/admin/products");
     } catch (error) {
       toast.error("حدث خطأ ما");
       console.error(error);
@@ -129,14 +128,11 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="p-6 max-w-screen-md mx-auto">
+      {" "}
       <div className="flex items-center justify-between">
-        <Heading
-          title="إضافة منتج جديد"
-          description="أضف منتجًا جديدًا إلى المتجر"
-        />
+        <Heading title="تعديل المنتج" description="تعديل بيانات المنتج" />
       </div>
       <Separator className="my-4" />
-
       <div className="mt-6">
         <Form {...form}>
           <form

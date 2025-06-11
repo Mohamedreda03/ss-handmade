@@ -69,17 +69,22 @@ export default function Page({ params }: { params: { courseId: string } }) {
 
           {data?.session?.user ? (
             <>
+              {" "}
               {!data?.isOwned ? (
                 <>
-                  <div className="flex items-center justify-center">
-                    <div className="text-lg z-20">
-                      <div className="bg-blue-500 text-white py-1 px-4 rounded-full flex items-center justify-center gap-2">
-                        <span>{data?.course?.price?.toFixed(2)}</span>
-                        <BadgeDollarSign size={18} className="text-white" />
+                  {" "}
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="bg-primary text-primary-foreground py-3 px-6 rounded-2xl shadow-lg border-2 border-primary/20">
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-2xl font-bold">
+                          {data?.course?.price?.toFixed(2)}
+                        </span>
+                        <span className="text-lg font-semibold">جنيه</span>
+                        <BadgeDollarSign
+                          size={24}
+                          className="text-primary-foreground/80"
+                        />
                       </div>
-                    </div>
-                    <div className="text-lg z-10 -mr-7 bg-primary/60 text-white py-1 pl-7 pr-10 rounded-full">
-                      جنيهًا
                     </div>
                   </div>
                   <CheckoutButton
@@ -95,18 +100,21 @@ export default function Page({ params }: { params: { courseId: string } }) {
             </>
           ) : (
             <>
+              {" "}
               <div className="flex items-center justify-center">
                 <div className="text-lg z-20">
-                  <div className="bg-blue-500 text-white py-1 px-4 rounded-full flex items-center justify-center gap-2">
+                  <div className="bg-primary text-primary-foreground py-1 px-4 rounded-full flex items-center justify-center gap-2 shadow-lg">
                     <span>{data?.course?.price?.toFixed(2)}</span>
-                    <BadgeDollarSign size={18} className="text-white" />
+                    <BadgeDollarSign
+                      size={18}
+                      className="text-primary-foreground/80"
+                    />
                   </div>
                 </div>
                 <div className="text-lg z-10 -mr-7 bg-secondary text-white py-1 pl-7 pr-10 rounded-full">
                   جنيهًا
                 </div>
               </div>
-
               <Button asChild className="w-full h-12 text-xl rounded-full mt-3">
                 <Link href="/sign-in">اشترك الان</Link>
               </Button>

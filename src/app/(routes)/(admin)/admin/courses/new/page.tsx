@@ -81,7 +81,7 @@ export default function NewCoursePage() {
     <div className="p-5 min-h-[calc(100vh-300px)] flex items-center justify-center">
       <div className="max-w-screen-lg w-full">
         <h1 className="md:text-3xl text-xl font-bold mb-2">
-          أختر أسم مناسب <span className="text-primary">للكورس</span>
+          أختر اسم مناسب <span className="text-primary">للكورس</span>
         </h1>
 
         <Form {...form}>

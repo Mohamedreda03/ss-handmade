@@ -105,13 +105,11 @@ export default function CheckoutPage() {
       cardholderName: "",
     },
   });
-
-  // Función para determinar el tipo de cada ítem (producto o curso)
+  // الدالة لتحديد نوع العنصر - في صفحة الدفع العادية، جميع العناصر هي منتجات
   const getItemType = (item: any): ItemType => {
-    // Basado en la URL o estructura del ítem, podemos identificar si es curso o producto
-    // Por ahora, asumimos que tienen un formato de URL distinto o algún identificador en el ID
-    // Si el id del producto contiene 'course', es un curso, de lo contrario, es un producto
-    return item.productId.includes("course") ? "course" : "product";
+    // في صفحة checkout العادية، جميع العناصر هي منتجات
+    // الكورسات لها صفحة دفع منفصلة /checkout-course
+    return "product";
   };
 
   const handleCheckout = async (values: PaymentFormValues) => {
@@ -166,21 +164,23 @@ export default function CheckoutPage() {
 
       // Verificar los tipos de ítems en el carrito
       const hasProducts = items.some((item) => getItemType(item) === "product");
-      const hasCourses = items.some((item) => getItemType(item) === "course");
-
-      // Llamar a la API para validar el cupón
+      const hasCourses = items.some((item) => getItemType(item) === "course"); // Llamar a la API para validar el cupón
       const response = await axios.patch("/api/coupons", {
         code: couponCode,
         amount: totalPrice,
         validateOnly: true,
         itemTypes: { hasProducts, hasCourses }, // Enviar información sobre los tipos de ítems
+        cartItems: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })), // إرسال عناصر السلة للتحقق
       });
 
       if (response.data.success) {
         // Verificar si el cupón es válido para los ítems en el carrito
-        const { couponType } = response.data;
+        const { couponType, productId: couponProductId } = response.data;
 
-        // Validar compatibilidad del cupón con el contenido del carrito
+        // Validar compatibilidad del kupón con الcontents del carro
         if (couponType === "course" && !hasCourses) {
           setCouponMessage({
             type: "error",
@@ -191,14 +191,30 @@ export default function CheckoutPage() {
           return;
         }
 
-        if (couponType === "product" && !hasProducts) {
-          setCouponMessage({
-            type: "error",
-            message: "هذا الكوبون صالح للمنتجات فقط وليس للكورسات",
-          });
-          setDiscount(0);
-          setCouponId(null);
-          return;
+        if (couponType === "product") {
+          if (!hasProducts) {
+            setCouponMessage({
+              type: "error",
+              message: "هذا الكوبون صالح للمنتجات فقط وليس للكورسات",
+            });
+            setDiscount(0);
+            setCouponId(null);
+            return;
+          }
+
+          // للكوبونات الخاصة بمنتج محدد، تحقق من وجود المنتج في السلة
+          if (
+            couponProductId &&
+            !items.some((item) => item.productId === couponProductId)
+          ) {
+            setCouponMessage({
+              type: "error",
+              message: "هذا الكوبون صالح لمنتج محدد غير موجود في سلتك",
+            });
+            setDiscount(0);
+            setCouponId(null);
+            return;
+          }
         }
 
         // Si llegamos aquí, el cupón es válido para los elementos en el carrito

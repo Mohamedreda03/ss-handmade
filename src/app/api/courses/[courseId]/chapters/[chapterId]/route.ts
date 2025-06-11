@@ -1,4 +1,3 @@
-import { deleteVideoFromVimeo } from "@/actions/deleteVideoFromVimeo";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { existsSync, unlinkSync } from "fs";
@@ -97,9 +96,7 @@ export async function DELETE(
 
     if (!chapter) {
       return new NextResponse("Chapter not found", { status: 404 });
-    }
-
-    // حذف الملفات المرتبطة بالـ Lessons
+    } // حذف الملفات المرتبطة بالـ Lessons
     for (const lesson of chapter.Lesson) {
       if (lesson.fileUrl) {
         const fileName = lesson.fileUrl.split("/").pop() as string;
@@ -109,9 +106,7 @@ export async function DELETE(
         }
       }
 
-      if (lesson.videoUrl) {
-        await deleteVideoFromVimeo(lesson.videoUrl);
-      }
+      // Note: videoUrl cleanup removed as we only support YouTube now
     }
 
     await prisma.chapter.delete({

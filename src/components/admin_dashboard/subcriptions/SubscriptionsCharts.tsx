@@ -55,19 +55,30 @@ const monthsInArabic = [
 
 export default function SubscriptionsCharts() {
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
-
-  const { data: subscriptionsData, isLoading } = useQuery({
+  const {
+    data: subscriptionsData,
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
     queryKey: ["subscriptions"],
     queryFn: async () => {
-      const { data } = await axios.get("/api/dashboard/subscription_stats");
-      return data;
+      console.log("🔄 Fetching subscription stats...");
+      try {
+        const { data } = await axios.get("/api/dashboard/subscription_stats");
+        console.log("✅ Subscription stats received:", data);
+        return data;
+      } catch (error) {
+        console.error("❌ Failed to fetch subscription stats:", error);
+        throw error;
+      }
     },
     staleTime: 60 * 1000 * 5, // 5 دقائق حتى إعادة الجلب
+    retry: 3,
+    retryDelay: 1000,
   });
-
   const processedData = useMemo(() => {
-    if (!subscriptionsData) return [];
-
+    // إذا لم تكن هناك بيانات، أنشئ بيانات فارغة للأشهر الـ 12 الماضية
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -83,6 +94,12 @@ export default function SubscriptionsCharts() {
       };
     }).reverse();
 
+    // إذا لم تكن هناك بيانات من الخادم، أرجع البيانات الفارغة
+    if (!subscriptionsData || subscriptionsData.length === 0) {
+      console.log("📊 No subscription data, showing empty chart");
+      return last12Months;
+    }
+
     // دمج البيانات الفعلية مع الهيكل
     subscriptionsData.forEach((item: any) => {
       const index = last12Months.findIndex(
@@ -93,15 +110,80 @@ export default function SubscriptionsCharts() {
       }
     });
 
+    console.log("📊 Processed chart data:", last12Months);
     return last12Months;
   }, [subscriptionsData]);
 
   const recentData = useMemo(() => {
     return processedData.slice(-5); // آخر 5 أشهر
   }, [processedData]);
-
   if (isLoading) {
     return <Loading className="h-[300px]" />;
+  }
+
+  if (isError) {
+    console.error("❌ Error loading subscription data:", error);
+    return (
+      <Card className="my-10">
+        <CardHeader>
+          <CardTitle>عدد الاشتراكات في الكورسات</CardTitle>
+          <CardDescription>حدث خطأ في تحميل البيانات</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <div className="text-center">
+              <p className="mb-2">⚠️ فشل في تحميل بيانات المخطط</p>
+              <p className="text-sm">يرجى التحقق من اتصال قاعدة البيانات</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  if (!subscriptionsData || subscriptionsData.length === 0) {
+    return (
+      <Card className="my-10">
+        <CardHeader>
+          <CardTitle>عدد الاشتراكات في الكورسات</CardTitle>
+          <CardDescription>آخر 5 أشهر</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer className="h-[500px] w-full" config={chartConfig}>
+            <BarChart
+              data={processedData.slice(-5)}
+              margin={{ top: 20 }}
+              accessibilityLayer
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value, index) => {
+                  const item = processedData.slice(-5)[index];
+                  return `${value}\n${item.year}`;
+                }}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Bar dataKey="count" fill="var(--color-desktop)" radius={8}>
+                <LabelList
+                  position="top"
+                  offset={8}
+                  className="fill-foreground"
+                  fontSize={14}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            📊 لا توجد اشتراكات حتى الآن - سيتم عرض البيانات عند توفرها
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

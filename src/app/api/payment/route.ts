@@ -43,21 +43,39 @@ export async function POST(req: NextRequest) {
         status: "PAID", // Cambiamos directamente a PAID para simular un pago exitoso
         payment_time: new Date(), // Registramos el tiempo de pago
       },
-    });
-
-    // Extraer los items del carrito del cuerpo de la petición
-    const { items, shippingAddress } = body;
+    }); // Extraer los items del carrito del cuerpo de la petición
+    const { items, shippingAddress, couponId } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return new NextResponse("No items provided", { status: 400 });
-    }
+    } // If coupon was used, mark it as used and create history record
+    if (couponId) {
+      await prisma.coupon.update({
+        where: {
+          id: couponId,
+        },
+        data: {
+          usedCount: {
+            increment: 1,
+          },
+          email: session.user.email,
+        },
+      });
 
-    // Crear la orden asociada al pago
+      // Create history record for coupon usage
+      await prisma.history.create({
+        data: {
+          userId: session.user.id,
+          couponId: couponId,
+          price: parseFloat(body.amount), // Store the final amount after discount
+        },
+      });
+    } // Crear la orden asociada al pago
     const order = await prisma.order.create({
       data: {
         userId: user.id,
         totalAmount: parseFloat(body.amount),
-        status: "COMPLETED", // La orden se completa directamente, ya que el pago se ha simulado
+        status: "PENDING", // الحالة الافتراضية للطلب هي قيد الانتظار
         // Guardar dirección y número de teléfono si están disponibles
         address: shippingAddress?.address || null,
         phoneNumber: shippingAddress?.phoneNumber || null,

@@ -20,16 +20,8 @@ export default function StudentCourseHeader({
           <h2 className="md:text-5xl text-3xl font-bold text-white">
             {course?.title}
           </h2>
-          {/* <p className="text-lg text-black/80 mt-4">{course?.description}</p> */}
-          <div
-            className="text-lg text-white mt-4 html-content"
-            dangerouslySetInnerHTML={{
-              __html: course?.description || "",
-            }}
-          />
 
           <div className="flex md:items-center gap-6 flex-col md:flex-row mt-5">
-            {" "}
             <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
                 <FolderPlus

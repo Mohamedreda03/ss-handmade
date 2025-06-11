@@ -1,4 +1,3 @@
-import { deleteVideoFromVimeo } from "@/actions/deleteVideoFromVimeo";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { existsSync, unlinkSync } from "fs";
@@ -185,9 +184,7 @@ export async function DELETE(
           }
         }
 
-        if (lesson.videoUrl) {
-          await deleteVideoFromVimeo(lesson.videoUrl);
-        }
+        // Note: videoUrl cleanup removed as we only support YouTube now
       }
     }
 

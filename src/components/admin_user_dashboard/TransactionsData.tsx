@@ -64,7 +64,7 @@ export default function TransactionsData({ userId }: TransactionsDataProps) {
         <Table dir="rtl" className="mb-8 border">
           <TableHeader>
             <TableRow>
-              {/* <TableHead className="text-center">أسم المستخدم</TableHead> */}
+              {/* <TableHead className="text-center">اسم المستخدم</TableHead> */}
               <TableHead className="text-center">تاريخ العمليه</TableHead>
               <TableHead className="text-center">القيمة</TableHead>
               {/* <TableHead className="text-center"></TableHead> */}

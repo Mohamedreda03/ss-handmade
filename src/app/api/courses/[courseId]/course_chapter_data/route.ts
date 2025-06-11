@@ -11,7 +11,7 @@ export async function GET(
     const isUserAuth = session ? true : false;
     const isUserAdmin = session?.user.role === "ADMIN";
 
-    const [chapters, subscription] = await Promise.all([
+    const [chapters, subscription, assignments] = await Promise.all([
       prisma.chapter.findMany({
         where: {
           courseId: courseId,
@@ -36,7 +36,6 @@ export async function GET(
               type: true,
               position: true,
               isPublished: true,
-              video_type: true,
 
               FileUserData: {
                 where: {
@@ -54,6 +53,15 @@ export async function GET(
                   isCompleted: true,
                 },
               },
+              assignment: {
+                include: {
+                  _count: {
+                    select: {
+                      submissions: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -65,12 +73,83 @@ export async function GET(
           userId: session?.user.id,
         },
       }),
+
+      // جلب المهام لتضمينها كدروس
+      prisma.assignment.findMany({
+        where: {
+          courseId: courseId,
+          isPublished: true,
+        },
+        include: {
+          lesson: {
+            select: {
+              id: true,
+              chapterId: true,
+              position: true,
+            },
+          },
+          submissions: {
+            where: {
+              studentId: session?.user.id,
+            },
+            include: {
+              grade: true,
+            },
+          },
+          _count: {
+            select: {
+              submissions: true,
+            },
+          },
+        },
+      }),
     ]);
 
     const isOwned = subscription ? true : false;
 
+    // دمج المهام مع الدروس في الفصول المناسبة
+    const chaptersWithAssignments = chapters.map((chapter) => {
+      // العثور على المهام التي تنتمي لهذا الفصل
+      const chapterAssignments = assignments.filter(
+        (assignment) => assignment.lesson?.chapterId === chapter.id
+      );
+
+      // تحويل المهام إلى صيغة دروس
+      const assignmentLessons = chapterAssignments.map((assignment) => ({
+        id: assignment.lesson?.id || assignment.id,
+        title: assignment.title,
+        type: "assignment" as const,
+        position: assignment.lesson?.position || 999, // موضع عالي إذا لم يكن محدد
+        isPublished: assignment.isPublished,
+        isFree: false, // المهام ليست مجانية عادة
+        chapterId: chapter.id,
+        FileUserData: [],
+        VideoUserData: [],
+        _count: {
+          AssignmentSubmissions: assignment._count.submissions,
+        },
+        // بيانات إضافية للمهام
+        assignmentData: {
+          id: assignment.id,
+          description: assignment.description,
+          maxGrade: assignment.maxGrade,
+          questionText: assignment.questionText,
+          questionType: assignment.questionType,
+          submissions: assignment.submissions,
+        },
+      })); // دمج الدروس العادية مع دروس المهام وترتيبها
+      const allLessons = [...chapter.Lesson, ...assignmentLessons].sort(
+        (a, b) => (a.position || 0) - (b.position || 0)
+      );
+
+      return {
+        ...chapter,
+        Lesson: allLessons,
+      };
+    });
+
     return NextResponse.json({
-      chapters,
+      chapters: chaptersWithAssignments,
       isOwned,
       isUserAuth,
       isUserAdmin,

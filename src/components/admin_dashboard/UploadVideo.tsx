@@ -2,16 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
-import { BadgeCheck, Upload } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { BadgeCheck } from "lucide-react";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
-import ReactPlayer from "react-player";
-import VimeoPlayer from "../VimeoPlayer";
-import {
-  getUploadVimeoLink,
-  updateVimeoVideoTitle,
-} from "@/utils/getUploadVimeoLink";
 import { Input } from "../ui/input";
 import { useMutation, useQueryClient } from "react-query";
 import { SecureVideoPlayer } from "../SecureVideoPlayer";
@@ -21,85 +15,47 @@ export default function UploadVideo({
   courseId,
   chapterId,
   lesson,
-  lessonVideoType,
   videoId,
 }: {
   video: string;
   courseId: string;
   chapterId: string;
   lesson: any;
-  lessonVideoType: "youtube" | "vimeo";
   videoId?: string;
 }) {
   const queryClient = useQueryClient();
   const [isMounted, setIsMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [videoType, setVideoType] = useState<"youtube" | "vimeo">(
-    lessonVideoType || "vimeo"
-  );
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [vid, setVid] = useState<{
-    url: string;
-    file: File | null;
-    videoId: string;
-  }>({
-    url: "",
-    file: null,
-    videoId: "",
-  });
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [youtubeVideoId, setYoutubeVideoId] = useState<string>("");
+  const [youtubeUrl, setYoutubeUrl] = useState<string>("");
   const router = useRouter();
-
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    // If there's an existing videoId, set it and construct the YouTube URL
+    if (videoId) {
+      setYoutubeVideoId(videoId);
+      setYoutubeUrl(`https://www.youtube.com/watch?v=${videoId}`);
+    }
+  }, [videoId]);
 
+  // Function to extract video ID from YouTube URL
+  const extractVideoId = (url: string): string => {
+    const regex =
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : "";
+  };
   const { mutateAsync } = useMutation({
     mutationFn: async () => {
-      if (videoType === "youtube") {
-        await axios.patch(
-          `/api/courses/${courseId}/chapters/${chapterId}/lessons/${lesson.id}`,
-          {
-            videoId: vid.videoId,
-            video_type: "youtube",
-            videoUrl: "",
-          }
-        );
-      }
-
-      if (videoType === "vimeo") {
-        const formData = new FormData();
-        formData.append("file", vid.file!);
-
-        const links = await getUploadVimeoLink(formData);
-
-        await axios({
-          method: "PATCH",
-          url: links.uploadLink,
-          headers: {
-            "Tus-Resumable": "1.0.0",
-            "Upload-Offset": "0",
-            "Content-Type": "application/offset+octet-stream",
-          },
-          data: vid.file,
-          onUploadProgress: (event) => {
-            const percentage = Math.round((event.loaded * 100) / event.total!);
-            setUploadProgress(percentage);
-          },
-        });
-
-        await updateVimeoVideoTitle(links.videoLink, lesson.title);
-
-        await axios.patch(
-          `/api/courses/${courseId}/chapters/${chapterId}/lessons/${lesson.id}`,
-          {
-            videoUrl: links.videoLink,
-            video_type: "vimeo",
-            videoId: "",
-          }
-        );
-      }
+      const videoIdToSend = extractVideoId(youtubeUrl);
+      await axios.patch(
+        `/api/courses/${courseId}/chapters/${chapterId}/lessons/${lesson.id}`,
+        {
+          videoId: videoIdToSend,
+          videoUrl: "",
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries("lessons");
@@ -111,18 +67,32 @@ export default function UploadVideo({
           </div>
         ),
       });
-      // router.refresh();
-      setIsEditing(false);
-      setUploadProgress(null);
       setIsLoading(false);
+      setIsEditing(false);
     },
   });
 
   if (!isMounted) return null;
-
   async function onSubmit() {
-    setIsLoading(true);
+    if (!youtubeUrl.trim()) {
+      toast({
+        variant: "destructive",
+        description: "يرجى إدخال رابط الفيديو من YouTube",
+      });
+      return;
+    }
 
+    const videoIdToUse = extractVideoId(youtubeUrl);
+    if (!videoIdToUse) {
+      toast({
+        variant: "destructive",
+        description:
+          "رابط YouTube غير صحيح. يرجى التأكد من الرابط والمحاولة مرة أخرى",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     await mutateAsync();
   }
 
@@ -134,97 +104,50 @@ export default function UploadVideo({
           {!isEditing && (
             <Button onClick={() => setIsEditing(true)}>تعديل</Button>
           )}
-        </div>
+        </div>{" "}
         {isEditing ? (
           <div>
-            <div className="flex items-center justify-center mb-8">
-              <div className="flex items-center justify-center gap-3 border p-2 rounded-lg border-secondary/50">
-                <Button
-                  variant={videoType === "vimeo" ? "secondary" : "outline"}
-                  onClick={() => {
-                    setVideoType("vimeo");
-                    setVid({ url: "", file: null, videoId: "" });
-                  }}
-                >
-                  vimeo
-                </Button>
-                <Button
-                  variant={videoType === "youtube" ? "secondary" : "outline"}
-                  onClick={() => {
-                    setVideoType("youtube");
-                    setVid({ url: "", file: null, videoId: "" });
-                  }}
-                >
-                  youtube
-                </Button>
-              </div>
-            </div>
-            {videoType === "youtube" && (
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                رابط الفيديو من YouTube
+              </label>
               <Input
-                placeholder="Youtube Video ID"
-                value={vid.videoId}
+                placeholder="https://www.youtube.com/watch?v=VIDEO_ID أو https://youtu.be/VIDEO_ID"
+                value={youtubeUrl}
                 className="mb-5"
-                onChange={(e) =>
-                  setVid({ url: "", file: null, videoId: e.target.value })
-                }
+                onChange={(e) => {
+                  setYoutubeUrl(e.target.value);
+                  // Auto-extract video ID when URL is entered
+                  if (e.target.value.trim()) {
+                    const extractedId = extractVideoId(e.target.value);
+                    if (extractedId) {
+                      setYoutubeVideoId(extractedId);
+                    }
+                  }
+                }}
               />
-            )}
+            </div>
 
-            <input
-              type="file"
-              className="hidden"
-              accept="video/*"
-              ref={inputRef}
-              onChange={(e) => {
-                setVid({
-                  url: URL.createObjectURL(e.target.files![0]),
-                  file: e.target.files![0],
-                  videoId: "",
-                });
-              }}
-            />
-
-            {vid.url.length > 0 && (
-              <div className="flex items-center justify-center">
-                <ReactPlayer url={vid.url} controls={true} />
+            {youtubeVideoId && (
+              <div className="mb-4">
+                <SecureVideoPlayer videoId={youtubeVideoId} />
               </div>
             )}
 
-            {videoType === "youtube" && vid.videoId && (
-              <SecureVideoPlayer videoId={vid.videoId} />
-            )}
-
-            {uploadProgress !== null && (
-              <div className="mb-4 mt-2 flex gap-4">
-                <span>{uploadProgress.toFixed(0)}%</span>
-                <div className="border w-full h-3 flex items-start rounded-full overflow-hidden">
-                  <span
-                    className={`h-[22px] bg-green-500`}
-                    style={{ width: `${uploadProgress}%` }}
-                  ></span>
-                </div>
-              </div>
-            )}
-
-            {videoType === "vimeo" && (
-              <Button
-                onClick={() => inputRef.current?.click()}
-                variant="outline"
-                className="w-60 mb-5 mt-3"
-                disabled={isLoading}
-              >
-                <Upload size={15} className="ml-2" />
-                اختر الفيديو
-              </Button>
-            )}
             <div className="mt-4">
               <Button onClick={onSubmit} disabled={isLoading}>
-                {isLoading ? "جاري رفع الفيديو..." : "حفظ"}
+                {isLoading ? "جاري الحفظ..." : "حفظ"}
               </Button>
               <Button
                 variant="outline"
-                className="mr-3 "
-                onClick={() => setIsEditing(false)}
+                className="mr-3"
+                onClick={() => {
+                  setIsEditing(false);
+                  setYoutubeUrl(
+                    videoId ? `https://www.youtube.com/watch?v=${videoId}` : ""
+                  );
+                  setYoutubeVideoId(videoId || "");
+                }}
               >
                 الغاء
               </Button>
@@ -232,16 +155,9 @@ export default function UploadVideo({
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            {video || videoId ? (
+            {videoId ? (
               <div className="relative w-full mt-4">
-                {lessonVideoType === "youtube" && videoId && (
-                  <SecureVideoPlayer videoId={videoId} />
-                )}
-                {video && lessonVideoType === "vimeo" && (
-                  <div className="aspect-video">
-                    <VimeoPlayer videoUrl={video} />
-                  </div>
-                )}
+                <SecureVideoPlayer videoId={videoId} />
               </div>
             ) : (
               <p>لا يوجد فيديو</p>

@@ -38,7 +38,7 @@ export async function PUT(
     });
     if (!existingContractor) {
       return NextResponse.json(
-        { error: true, message: "كونستركتور غير موجود" },
+        { error: true, message: "مُنسق غير موجود" },
         { status: 404 }
       );
     } // Update contractor status
@@ -73,7 +73,7 @@ export async function PUT(
     return NextResponse.json({
       message: `تم ${
         status === "APPROVED" ? "قبول" : status === "REJECTED" ? "رفض" : "تعليق"
-      } طلب الكونستركتور بنجاح`,
+      } طلب المُنسق بنجاح`,
       contractor: updatedContractor,
     });
   } catch (error) {
@@ -117,7 +117,7 @@ export async function PATCH(
 
     if (!existingContractor) {
       return NextResponse.json(
-        { success: false, error: "الكونستركتور غير موجود" },
+        { success: false, error: "المُنسق غير موجود" },
         { status: 404 }
       );
     } // Update contractor status
@@ -167,7 +167,7 @@ export async function PATCH(
       data: updatedContractor,
       message: `تم ${
         status === "APPROVED" ? "قبول" : status === "REJECTED" ? "رفض" : "تعليق"
-      } طلب الكونستركتور بنجاح`,
+      } طلب المُنسق بنجاح`,
     });
   } catch (error) {
     console.error("[CONTRACTOR_UPDATE_ERROR]", error);
@@ -208,7 +208,7 @@ export async function GET(
 
     if (!contractor) {
       return NextResponse.json(
-        { error: true, message: "الكونستركتور غير موجود" },
+        { error: true, message: "المُنسق غير موجود" },
         { status: 404 }
       );
     }
@@ -220,7 +220,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching contractor:", error);
     return NextResponse.json(
-      { error: true, message: "حدث خطأ في تحميل بيانات الكونستركتور" },
+      { error: true, message: "حدث خطأ في تحميل بيانات المُنسق" },
       { status: 500 }
     );
   }

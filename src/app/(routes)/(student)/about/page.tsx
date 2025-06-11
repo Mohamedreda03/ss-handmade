@@ -3,14 +3,7 @@
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  BookOpen,
-  Heart,
-  Users,
-  MessageCircle,
-  Star,
-  Sparkles,
-} from "lucide-react";
+import { BookOpen, Heart, Users, Star, Sparkles } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -112,7 +105,6 @@ export default function AboutPage() {
               العمل اليدوي الأصيل.
             </p>
           </Card>
-
           <Card className="p-6 hover:shadow-lg transition-all">
             <div className="bg-primary/10 p-3 rounded-full w-fit mb-4">
               <Users className="w-6 h-6 text-primary" />
@@ -123,7 +115,6 @@ export default function AboutPage() {
               فيها الجميع الخبرات والأفكار.
             </p>
           </Card>
-
           <Card className="p-6 hover:shadow-lg transition-all">
             <div className="bg-primary/10 p-3 rounded-full w-fit mb-4">
               <BookOpen className="w-6 h-6 text-primary" />
@@ -133,52 +124,6 @@ export default function AboutPage() {
               نشجع على التطور والتعلم المستمر، ونسعى دائماً لتجديد محتوانا
               ومواكبة أحدث التقنيات والأساليب.
             </p>
-          </Card>
-        </div>
-      </div>
-
-      {/* قسم التواصل */}
-      <div className="bg-muted p-8 rounded-2xl">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-3">تواصل معنا</h2>
-          <p className="text-lg text-muted-foreground">
-            نحن دائماً سعداء بالتواصل معكم والإجابة عن استفساراتكم
-          </p>
-        </div>
-
-        <div className="flex justify-center">
-          <Card className="p-6 max-w-lg w-full">
-            <div className="flex items-center gap-3 mb-4">
-              <MessageCircle className="text-primary" />
-              <h3 className="font-bold">أرسل لنا رسالة</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="الاسم"
-                  className="rounded-md border p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                  type="email"
-                  placeholder="البريد الإلكتروني"
-                  className="rounded-md border p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="الموضوع"
-                className="rounded-md border p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <textarea
-                placeholder="رسالتك"
-                rows={4}
-                className="rounded-md border p-3 w-full focus:outline-none focus:ring-2 focus:ring-primary"
-              ></textarea>
-              <button className="bg-primary text-white py-3 px-6 rounded-md w-full hover:bg-primary/90 transition-colors">
-                إرسال الرسالة
-              </button>
-            </div>
           </Card>
         </div>
       </div>

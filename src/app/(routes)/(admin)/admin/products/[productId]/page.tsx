@@ -28,79 +28,141 @@ import {
   uploadImageToSupabase,
 } from "@/utils/uploadToSupabase";
 import Loading from "@/components/Loading";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(3, "اسم المنتج لا يقل عن 3 أحرف"),
   description: z.string().optional(),
-  price: z.preprocess(
-    (a) => parseFloat(z.string().parse(a)),
-    z.number().positive("السعر يجب أن يكون رقم موجب")
-  ),
-  stock: z.preprocess(
-    (a) => parseInt(z.string().parse(a)),
-    z.number().nonnegative("الكمية يجب أن تكون رقم موجب أو صفر")
-  ),
-  imageUrl: z
-    .string()
-    .url("من فضلك أدخل رابط صحيح")
-    .optional()
-    .or(z.literal("")),
+  price: z.union([
+    z.string().transform((val) => parseFloat(val)),
+    z.number()
+  ]).refine((val) => val > 0, "السعر يجب أن يكون رقم موجب"),
+  stock: z.union([
+    z.string().transform((val) => parseInt(val)),
+    z.number()
+  ]).refine((val) => val >= 0, "الكمية يجب أن تكون رقم موجب أو صفر"),
+  imageUrl: z.string().optional().or(z.literal("")),
   isAvailable: z.boolean().default(true),
 });
 
 const EditProductPage = ({ params }: { params: { productId: string } }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`/api/admin/products/${params.productId}`);
-
-        form.reset({
-          name: res.data.name,
-          description: res.data.description,
-          price: res.data.price,
-          stock: res.data.stock,
-          imageUrl: res.data.imageUrl || "",
-          isAvailable: res.data.isAvailable,
-        });
-      } catch (error) {
-        toast.error("خطأ في جلب بيانات المنتج");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [params.productId]);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      stock: 0,
+      imageUrl: "",
+      isAvailable: true,
+    },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setLoading(true);
+
+  // Fetch product data using React Query
+  const {
+    data: product,
+    isLoading: isLoadingProduct,
+    error: productError,
+  } = useQuery(
+    ["product", params.productId],
+    async () => {
+      const response = await axios.get(
+        `/api/admin/products/${params.productId}`
+      );
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        form.reset({
+          name: data.name,
+          description: data.description || "",
+          price: data.price,
+          stock: data.stock,
+          imageUrl: data.imageUrl || "",
+          isAvailable: data.isAvailable,
+        });
+
+        // Set image preview if the product has an image
+        if (data.imageUrl) {
+          setImagePreview(data.imageUrl);
+        }
+      },
+      onError: (error) => {
+        console.error("Error fetching product:", error);
+        toast.error("خطأ في جلب بيانات المنتج");
+      },
+    }
+  );  // Update product mutation
+  const updateProductMutation = useMutation(
+    async (values: z.infer<typeof formSchema>) => {
+      console.log("🚀 Mutation started with values:", values);
+      let finalValues = { 
+        ...values,
+        // تأكد من أن الأرقام يتم إرسالها كـ numbers وليس strings
+        price: typeof values.price === 'string' ? parseFloat(values.price) : values.price,
+        stock: typeof values.stock === 'string' ? parseInt(values.stock) : values.stock,
+      };
 
       // If there's a new image file, upload it to Supabase and get the URL
       if (imageFile) {
-        await deleteImageFromSupabase(values.imageUrl!);
+        console.log("Uploading new image...");
+        // Only delete old image if it exists and it's a Supabase URL
+        if (finalValues.imageUrl && finalValues.imageUrl.includes("supabase")) {
+          await deleteImageFromSupabase(finalValues.imageUrl);
+        }
         const url = await uploadImageToSupabase(imageFile);
-        values.imageUrl = url;
+        finalValues.imageUrl = url;
+        console.log("New image URL:", url);
       }
 
-      await axios.patch(`/api/admin/products/${params.productId}`, values);
-      toast.success("تم تعديل المنتج بنجاح");
-      router.push("/admin/products");
-    } catch (error) {
-      toast.error("حدث خطأ ما");
-      console.error(error);
-    } finally {
-      setLoading(false);
+      console.log("🌐 Sending PATCH request to:", `/api/admin/products/${params.productId}`);
+      console.log("🌐 With data:", finalValues);
+
+      const response = await axios.patch(
+        `/api/admin/products/${params.productId}`,
+        finalValues
+      );
+      
+      console.log("✅ Response received:", response.data);
+      return response.data;
+    },
+    {
+      onMutate: (variables) => {
+        console.log("🔄 Mutation started with variables:", variables);
+      },
+      onSuccess: (data) => {
+        console.log("✅ Mutation successful:", data);
+        toast.success("تم تعديل المنتج بنجاح");
+        // Invalidate and refetch products list
+        queryClient.invalidateQueries(["products"]);
+        queryClient.invalidateQueries(["product", params.productId]);
+        router.push("/admin/products");
+      },
+      onError: (error: any) => {
+        console.error("❌ Submit error:", error);
+        if (error.response) {
+          console.error("❌ Error response:", error.response.data);
+          toast.error(
+            `خطأ: ${error.response.data.message || "حدث خطأ في الخادم"}`
+          );
+        } else {
+          toast.error("حدث خطأ ما");
+        }
+      },
     }
+  );
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("🔥 onSubmit called with values:", values);
+    console.log("🔥 Form state:", form.formState);
+    console.log("🔥 Form values:", form.getValues());
+    console.log("🔥 Mutation state:", updateProductMutation);
+    updateProductMutation.mutate(values);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,15 +176,29 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
       reader.readAsDataURL(file);
     }
   };
-
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
     form.setValue("imageUrl", "");
   };
 
-  if (loading) {
+  if (isLoadingProduct) {
     return <Loading className="h-[600px]" />;
+  }
+
+  if (productError) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            ⚠️ خطأ في تحميل البيانات
+          </h2>
+          <p className="text-muted-foreground">
+            يرجى التحقق من اتصال قاعدة البيانات والمحاولة مرة أخرى
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -143,10 +219,10 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>اسم المنتج</FormLabel>
+                  <FormLabel>اسم المنتج</FormLabel>{" "}
                   <FormControl>
                     <Input
-                      disabled={loading}
+                      disabled={updateProductMutation.isLoading}
                       placeholder="اسم المنتج"
                       {...field}
                     />
@@ -160,10 +236,10 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>الوصف</FormLabel>
+                  <FormLabel>الوصف</FormLabel>{" "}
                   <FormControl>
                     <Textarea
-                      disabled={loading}
+                      disabled={updateProductMutation.isLoading}
                       placeholder="وصف المنتج"
                       {...field}
                     />
@@ -178,10 +254,10 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>السعر</FormLabel>
+                    <FormLabel>السعر</FormLabel>{" "}
                     <FormControl>
                       <Input
-                        disabled={loading}
+                        disabled={updateProductMutation.isLoading}
                         type="number"
                         step="0.01"
                         placeholder="0.00"
@@ -197,10 +273,10 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                 name="stock"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الكمية</FormLabel>
+                    <FormLabel>الكمية</FormLabel>{" "}
                     <FormControl>
                       <Input
-                        disabled={loading}
+                        disabled={updateProductMutation.isLoading}
                         type="number"
                         placeholder="0"
                         {...field}
@@ -220,8 +296,9 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                   <div className="space-y-4">
                     <FormControl>
                       <div className="flex flex-col space-y-4">
+                        {" "}
                         <Input
-                          disabled={loading}
+                          disabled={updateProductMutation.isLoading}
                           placeholder="https://..."
                           {...field}
                           className={imageFile ? "hidden" : "block"}
@@ -248,9 +325,9 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                           </Button>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span>أو</span>
+                          <span>أو</span>{" "}
                           <Input
-                            disabled={loading}
+                            disabled={updateProductMutation.isLoading}
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
@@ -276,27 +353,36 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                     <FormDescription>
                       هل هذا المنتج متاح للبيع حاليًا؟
                     </FormDescription>
-                  </div>
+                  </div>{" "}
                   <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={loading}
+                      disabled={updateProductMutation.isLoading}
                       dir="ltr"
                     />
                   </FormControl>
                 </FormItem>
               )}
-            />
-            <div className="flex gap-2">
-              <Button disabled={loading} type="submit">
-                تعديل المنتج
+            />{" "}            <div className="flex gap-2">
+              <Button 
+                disabled={updateProductMutation.isLoading} 
+                type="submit"
+              >
+                {updateProductMutation.isLoading ? (
+                  <>
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  "تعديل المنتج"
+                )}
               </Button>
               <Button
-                disabled={loading}
+                disabled={updateProductMutation.isLoading}
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/my-products/")}
+                onClick={() => router.push("/admin/products")}
               >
                 إلغاء
               </Button>

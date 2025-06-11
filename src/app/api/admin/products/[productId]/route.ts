@@ -33,8 +33,17 @@ export async function PATCH(
   { params }: { params: { productId: string } }
 ) {
   try {
-    const { name, description, price, imageUrl, stock, isAvailable } =
-      await req.json();
+    const body = await req.json();
+    const { name, description, price, imageUrl, stock, isAvailable } = body;
+
+    console.log("PATCH request received:", {
+      name,
+      description,
+      price: { value: price, type: typeof price },
+      imageUrl,
+      stock: { value: stock, type: typeof stock },
+      isAvailable,
+    });
 
     const session = await auth();
     if (!session) {
@@ -51,19 +60,55 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    if (!params.productId) {
+      return new NextResponse("Product ID is required", { status: 400 });
+    }    // Prepare update data with validation
+    const updateData: any = {};
+
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.length < 3) {
+        return new NextResponse("اسم المنتج يجب أن يكون نص لا يقل عن 3 أحرف", { status: 400 });
+      }
+      updateData.name = name;
+    }
+    
+    if (description !== undefined) updateData.description = description;
+    
+    if (price !== undefined) {
+      const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+      if (isNaN(numPrice) || numPrice <= 0) {
+        return new NextResponse("السعر يجب أن يكون رقم موجب", { status: 400 });
+      }
+      updateData.price = numPrice;
+    }
+    
+    if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+    
+    if (stock !== undefined) {
+      const numStock = typeof stock === 'string' ? parseInt(stock) : stock;
+      if (isNaN(numStock) || numStock < 0) {
+        return new NextResponse("الكمية يجب أن تكون رقم موجب أو صفر", { status: 400 });
+      }
+      updateData.stock = numStock;
+    }
+    
+    if (isAvailable !== undefined) {
+      if (typeof isAvailable !== 'boolean') {
+        return new NextResponse("حالة التوفر يجب أن تكون true أو false", { status: 400 });
+      }
+      updateData.isAvailable = isAvailable;
+    }
+
+    console.log("Update data:", updateData);
+
     const product = await prisma.product.update({
       where: {
         id: params.productId,
       },
-      data: {
-        name,
-        description,
-        price: price !== undefined ? parseFloat(price) : undefined,
-        imageUrl,
-        stock: stock !== undefined ? stock : undefined,
-        isAvailable,
-      },
+      data: updateData,
     });
+
+    console.log("Updated product:", product);
 
     return NextResponse.json(product);
   } catch (error) {

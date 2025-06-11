@@ -24,34 +24,34 @@ export default function EditSuccessStoryPage({
   const [story, setStory] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchStory = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get("/api/user/success-stories");
-      const userStories = response.data;
-      const foundStory = userStories.find((s: any) => s.id === params.id);
-
-      if (foundStory) {
-        setStory(foundStory);
-      } else {
-        toast.error("لم يتم العثور على قصة النجاح");
-        router.push("/my-success-stories");
-      }
-    } catch (error) {
-      toast.error("حدث خطأ أثناء جلب بيانات قصة النجاح");
-      router.push("/my-success-stories");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchStory = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get("/api/user/success-stories");
+        const userStories = response.data;
+        const foundStory = userStories.find((s: any) => s.id === params.id);
+
+        if (foundStory) {
+          setStory(foundStory);
+        } else {
+          toast.error("لم يتم العثور على قصة النجاح");
+          router.push("/my-success-stories");
+        }
+      } catch (error) {
+        toast.error("حدث خطأ أثناء جلب بيانات قصة النجاح");
+        router.push("/my-success-stories");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (status === "unauthenticated") {
       router.push("/sign-in");
     } else if (status === "authenticated") {
       fetchStory();
     }
-  }, [status, router, params.id, fetchStory]);
+  }, [status, router, params.id]);
 
   if (status === "loading" || isLoading) {
     return (

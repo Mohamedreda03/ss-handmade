@@ -63,6 +63,7 @@ const dgagnadeen = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "https://your-domain.com"),
   title: "crafteria",
   description: "منصة تعليمية متخصصة في الحرف اليدوية وبيع المنتجات الحرفية",
   keywords: "حرف يدوية، دورات، منتجات، تعليم، صناعة يدوية، حرفيين، handmade",

@@ -28,16 +28,15 @@ export default function StudentCourseHeader({
             }}
           />
 
-          <div className="flex md:items-center gap-6 flex-col md:flex-row mt-5">
-            <div className="flex items-center gap-2 flex-col md:flex-row">
+          <div className="flex md:items-center gap-6 flex-col md:flex-row mt-5">            <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
                 <FolderPlus
                   size={16}
-                  className="text-sky-400 text-sm sm:text-md"
+                  className="text-primary-foreground text-sm sm:text-md"
                 />
                 <span className="underline text-white">تاريخ انشاء الكورس</span>
               </div>
-              <span className="bg-sky-400 py-1 px-3 rounded-full text-sm">
+              <span className="bg-primary-foreground text-primary py-1 px-3 rounded-full text-sm font-medium">
                 {format(new Date(course?.createdAt), "eeee, do MMM yyyy", {
                   locale: ar,
                 })}
@@ -46,10 +45,10 @@ export default function StudentCourseHeader({
 
             <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
-                <RefreshCcw size={16} className="text-rose-500" />
+                <RefreshCcw size={16} className="text-secondary" />
                 <span className="underline text-white">آخر تحديث للكورس</span>
               </div>
-              <span className="bg-rose-500 py-1 px-3 rounded-full text-sm">
+              <span className="bg-secondary text-primary py-1 px-3 rounded-full text-sm font-medium">
                 {format(new Date(course?.updatedAt), "eeee, do MMM yyyy", {
                   locale: ar,
                 })}

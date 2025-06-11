@@ -116,7 +116,6 @@ export default function SuccessStoryDetailsPage({
                   </Badge>
                 </div>
               </div>
-
               {story.course && (
                 <div className="mb-6">
                   <Badge variant="outline" className="text-base px-3 py-1">
@@ -124,10 +123,10 @@ export default function SuccessStoryDetailsPage({
                   </Badge>
                 </div>
               )}
-
               <div className="prose prose-lg max-w-none mb-8">
                 <p className="whitespace-pre-wrap">{story.story}</p>
-              </div>              <div className="border-t pt-4 flex flex-col sm:flex-row sm:items-center justify-between text-gray-500">
+              </div>{" "}
+              <div className="border-t pt-4 flex flex-col sm:flex-row sm:items-center justify-between text-gray-500">
                 <div className="flex items-center gap-2 mb-2 sm:mb-0">
                   <div className="relative h-8 w-8 rounded-full overflow-hidden">
                     <Image

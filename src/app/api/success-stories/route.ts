@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
     let query: any = {
       where: {
         status: "APPROVED",
-      },      include: {
+      },
+      include: {
         user: {
           select: {
             name: true,

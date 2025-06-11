@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
     // حساب عدد العناصر التي يجب تخطيها
     const skip = (page - 1) * limit;
 
-    let query: any = {      include: {
+    let query: any = {
+      include: {
         user: {
           select: {
             name: true,

@@ -19,7 +19,8 @@ export async function GET(
       where: {
         id,
         status: "APPROVED", // Only return approved stories
-      },      include: {
+      },
+      include: {
         user: {
           select: {
             name: true,

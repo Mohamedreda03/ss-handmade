@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 
 export const isAuth = async () => {
   try {
@@ -10,7 +9,6 @@ export const isAuth = async () => {
     console.log("Session check:", {
       hasSession: !!session,
       userId: session?.user?.id,
-      deviceId: session?.user?.device_id,
     });
 
     if (!session) {
@@ -18,31 +16,7 @@ export const isAuth = async () => {
       return false;
     }
 
-    const deviceId = session?.user.device_id;
-
-    const findSession = await prisma.session.findFirst({
-      where: {
-        userId: session?.user.id,
-      },
-    });
-
-    console.log("Database session check:", {
-      hasDbSession: !!findSession,
-      dbDeviceId: findSession?.device_id,
-      sessionDeviceId: deviceId,
-      match: findSession?.device_id === deviceId,
-    });
-
-    if (!findSession) {
-      console.log("No session found in database");
-      return false;
-    }
-
-    if (findSession?.device_id !== deviceId) {
-      console.log("Device ID mismatch");
-      return false;
-    }
-
+    // With NextAuth and PrismaAdapter, if session exists, user is authenticated
     console.log("Auth check passed");
     return true;
   } catch (error) {

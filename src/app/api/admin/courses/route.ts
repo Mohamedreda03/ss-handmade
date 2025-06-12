@@ -23,10 +23,19 @@ export async function GET(request: NextRequest) {
         { error: "Forbidden - Admin or Constructor access required" },
         { status: 403 }
       );
-    }
+    } // Get courses based on user role
+    let whereClause = {};
 
-    // Get all courses with basic info
+    if (user.role === "CONSTRUCTOR") {
+      // Constructor only sees their own courses
+      whereClause = {
+        userId: session.user.id,
+      };
+    }
+    // Admin sees all courses (no where clause needed)
+
     const courses = await prisma.course.findMany({
+      where: whereClause,
       select: {
         id: true,
         title: true,

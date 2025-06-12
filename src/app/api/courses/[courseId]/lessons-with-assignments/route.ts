@@ -25,8 +25,22 @@ export async function GET(
         { status: 403 }
       );
     }
-
     const { courseId } = params;
+
+    // For CONSTRUCTOR, verify ownership of the course
+    if (user.role === "CONSTRUCTOR") {
+      const courseAccess = await prisma.course.findUnique({
+        where: { id: courseId },
+        select: { userId: true },
+      });
+
+      if (!courseAccess || courseAccess.userId !== session.user.id) {
+        return NextResponse.json(
+          { error: "Forbidden - You don't own this course" },
+          { status: 403 }
+        );
+      }
+    }
 
     // Get all lessons with assignments for the course
     const lessons = await prisma.lesson.findMany({

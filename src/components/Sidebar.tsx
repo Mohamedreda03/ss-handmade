@@ -11,7 +11,6 @@ export default function Sidebar({ role }: { role: string }) {
   return (
     <div className="lg:block shadow fixed right-0 inset-y-0 w-60 border-l hidden">
       <div>
-        {" "}
         <div className="flex items-center justify-center h-[150px] bg-primary">
           <Image src="/logo.png" alt="Handmade Logo" width={120} height={80} />
         </div>

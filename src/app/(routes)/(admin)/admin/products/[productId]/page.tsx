@@ -34,14 +34,12 @@ import { LoaderCircle } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(3, "اسم المنتج لا يقل عن 3 أحرف"),
   description: z.string().optional(),
-  price: z.union([
-    z.string().transform((val) => parseFloat(val)),
-    z.number()
-  ]).refine((val) => val > 0, "السعر يجب أن يكون رقم موجب"),
-  stock: z.union([
-    z.string().transform((val) => parseInt(val)),
-    z.number()
-  ]).refine((val) => val >= 0, "الكمية يجب أن تكون رقم موجب أو صفر"),
+  price: z
+    .union([z.string().transform((val) => parseFloat(val)), z.number()])
+    .refine((val) => val > 0, "السعر يجب أن يكون رقم موجب"),
+  stock: z
+    .union([z.string().transform((val) => parseInt(val)), z.number()])
+    .refine((val) => val >= 0, "الكمية يجب أن تكون رقم موجب أو صفر"),
   imageUrl: z.string().optional().or(z.literal("")),
   isAvailable: z.boolean().default(true),
 });
@@ -98,15 +96,21 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
         toast.error("خطأ في جلب بيانات المنتج");
       },
     }
-  );  // Update product mutation
+  ); // Update product mutation
   const updateProductMutation = useMutation(
     async (values: z.infer<typeof formSchema>) => {
       console.log("🚀 Mutation started with values:", values);
-      let finalValues = { 
+      let finalValues = {
         ...values,
         // تأكد من أن الأرقام يتم إرسالها كـ numbers وليس strings
-        price: typeof values.price === 'string' ? parseFloat(values.price) : values.price,
-        stock: typeof values.stock === 'string' ? parseInt(values.stock) : values.stock,
+        price:
+          typeof values.price === "string"
+            ? parseFloat(values.price)
+            : values.price,
+        stock:
+          typeof values.stock === "string"
+            ? parseInt(values.stock)
+            : values.stock,
       };
 
       // If there's a new image file, upload it to Supabase and get the URL
@@ -121,14 +125,17 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
         console.log("New image URL:", url);
       }
 
-      console.log("🌐 Sending PATCH request to:", `/api/admin/products/${params.productId}`);
+      console.log(
+        "🌐 Sending PATCH request to:",
+        `/api/admin/products/${params.productId}`
+      );
       console.log("🌐 With data:", finalValues);
 
       const response = await axios.patch(
         `/api/admin/products/${params.productId}`,
         finalValues
       );
-      
+
       console.log("✅ Response received:", response.data);
       return response.data;
     },
@@ -364,11 +371,9 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                   </FormControl>
                 </FormItem>
               )}
-            />{" "}            <div className="flex gap-2">
-              <Button 
-                disabled={updateProductMutation.isLoading} 
-                type="submit"
-              >
+            />{" "}
+            <div className="flex gap-2">
+              <Button disabled={updateProductMutation.isLoading} type="submit">
                 {updateProductMutation.isLoading ? (
                   <>
                     <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />

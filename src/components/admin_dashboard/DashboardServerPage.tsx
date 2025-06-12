@@ -233,9 +233,9 @@ export default async function DashboardPage() {
                   <div>
                     <h3 className="font-semibold text-primary">
                       {course.title}
-                    </h3>
+                    </h3>{" "}
                     <p className="text-sm text-muted-foreground">
-                      {course._count.Subscription} اشتراك • {course.price} ر.س
+                      {course._count.Subscription} اشتراك • {course.price} EGP
                     </p>
                   </div>
                 </div>

@@ -62,39 +62,45 @@ export async function PATCH(
 
     if (!params.productId) {
       return new NextResponse("Product ID is required", { status: 400 });
-    }    // Prepare update data with validation
+    } // Prepare update data with validation
     const updateData: any = {};
 
     if (name !== undefined) {
-      if (typeof name !== 'string' || name.length < 3) {
-        return new NextResponse("اسم المنتج يجب أن يكون نص لا يقل عن 3 أحرف", { status: 400 });
+      if (typeof name !== "string" || name.length < 3) {
+        return new NextResponse("اسم المنتج يجب أن يكون نص لا يقل عن 3 أحرف", {
+          status: 400,
+        });
       }
       updateData.name = name;
     }
-    
+
     if (description !== undefined) updateData.description = description;
-    
+
     if (price !== undefined) {
-      const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+      const numPrice = typeof price === "string" ? parseFloat(price) : price;
       if (isNaN(numPrice) || numPrice <= 0) {
         return new NextResponse("السعر يجب أن يكون رقم موجب", { status: 400 });
       }
       updateData.price = numPrice;
     }
-    
+
     if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
-    
+
     if (stock !== undefined) {
-      const numStock = typeof stock === 'string' ? parseInt(stock) : stock;
+      const numStock = typeof stock === "string" ? parseInt(stock) : stock;
       if (isNaN(numStock) || numStock < 0) {
-        return new NextResponse("الكمية يجب أن تكون رقم موجب أو صفر", { status: 400 });
+        return new NextResponse("الكمية يجب أن تكون رقم موجب أو صفر", {
+          status: 400,
+        });
       }
       updateData.stock = numStock;
     }
-    
+
     if (isAvailable !== undefined) {
-      if (typeof isAvailable !== 'boolean') {
-        return new NextResponse("حالة التوفر يجب أن تكون true أو false", { status: 400 });
+      if (typeof isAvailable !== "boolean") {
+        return new NextResponse("حالة التوفر يجب أن تكون true أو false", {
+          status: 400,
+        });
       }
       updateData.isAvailable = isAvailable;
     }

@@ -59,23 +59,33 @@ export default function Navbar() {
                 priority
               />
             </Link>
-          </div>
-
+          </div>{" "}
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              className="p-2 hover:bg-primary-darker rounded-full"
+          <div className="md:hidden flex items-center gap-4">
+            <Link
+              href="/cart"
+              className="relative p-2 hover:bg-primary-darker rounded-full"
+            >
+              <FaCartShopping className="h-6 w-6 text-white" />
+              {/* إظهار عدد العناصر فقط إذا كان أكبر من صفر */}
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-primary border border-primary text-xs rounded-full size-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>{" "}
+            <AuthMenu session={session} />
+            <div
+              className="p-3 hover:bg-primary-darker rounded-full cursor-pointer transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-white" />
+                <X className="h-8 w-8 text-white" />
               ) : (
-                <Menu className="h-6 w-6 text-white" />
+                <Menu className="h-8 w-8 text-white" />
               )}
-            </Button>
+            </div>
           </div>
-
           {/* Navigation Links (Center) - Desktop */}
           <div className="hidden md:flex items-center justify-center flex-1">
             <ul className="flex gap-8">
@@ -95,10 +105,9 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* User and Cart Icons (Left side) */}
-          <div className="flex items-center gap-6">
+          </div>{" "}
+          {/* User and Cart Icons (Left side) - Desktop only */}
+          <div className="hidden md:flex items-center gap-6">
             <Link
               href="/cart"
               className="relative p-2 hover:bg-primary-darker rounded-full"

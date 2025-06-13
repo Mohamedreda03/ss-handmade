@@ -175,7 +175,6 @@ export default function SuccessStoriesPage() {
   useEffect(() => {
     setCurrentPage(1); // إعادة تعيين الصفحة عند تغيير الفلاتر
   }, [selectedProfession, selectedCourse, sortBy]);
-
   useEffect(() => {
     fetchStories(currentPage);
   }, [currentPage, selectedProfession, selectedCourse, sortBy]);

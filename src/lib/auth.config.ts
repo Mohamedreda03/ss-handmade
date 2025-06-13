@@ -107,7 +107,8 @@ export default {
         }
       },
     }),
-  ],  callbacks: {
+  ],
+  callbacks: {
     async jwt({ token, user }) {
       if (user && user.id) {
         token.user = {

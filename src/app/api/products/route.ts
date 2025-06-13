@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ProductType } from "@prisma/client";
+import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
   try {
@@ -88,5 +90,63 @@ export async function GET(request: Request) {
       },
       { status: 500 }
     );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const session = await auth();
+
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // Allow both STUDENT and CONSTRUCTOR to create products
+    if (!["STUDENT", "CONSTRUCTOR", "ADMIN"].includes(session.user.role)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { name, description, price, imageUrl, stock, isAvailable } =
+      await req.json();
+
+    // Validate required fields
+    if (!name || typeof name !== "string" || name.length < 3) {
+      return new NextResponse("اسم المنتج مطلوب ولا يقل عن 3 أحرف", {
+        status: 400,
+      });
+    }
+
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return new NextResponse("السعر يجب أن يكون رقم موجب", { status: 400 });
+    }
+
+    const numStock = typeof stock === "string" ? parseInt(stock) : stock;
+    if (isNaN(numStock) || numStock < 0) {
+      return new NextResponse("الكمية يجب أن تكون رقم موجب أو صفر", {
+        status: 400,
+      });
+    }
+
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description: description || "",
+        price: numPrice,
+        imageUrl: imageUrl || null,
+        stock: numStock,
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+        type: "HANDMADE", // Products created by users are HANDMADE
+        userId: session.user.id, // Associate product with the user
+      },
+    });
+
+    // Revalidate the my-products page to show the new product
+    revalidatePath("/my-products");
+
+    return NextResponse.json(product, { status: 201 });
+  } catch (error) {
+    console.log("[PRODUCTS_POST]", error);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 }

@@ -90,15 +90,6 @@ export default function AuthMenu({ session }: { session: any }) {
             )}
 
             <DropdownMenuGroup>
-              {navigationMenu.map((item) => (
-                <DropdownMenuItem key={item.href} asChild>
-                  <Link href={item.href}>
-                    <item.Icon className="ml-2 h-4 w-4" />
-                    <span className="ml-2">{item.name}</span>
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-
               <DropdownMenuItem asChild>
                 <Link href="/profile">
                   <User className="ml-2 h-4 w-4" />
@@ -110,13 +101,6 @@ export default function AuthMenu({ session }: { session: any }) {
                 <Link href="/student_courses">
                   <Book className="ml-2 h-4 w-4" />
                   <span>كورساتي</span>
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem asChild>
-                <Link href="/my-success-stories">
-                  <Star className="ml-2 h-4 w-4" />
-                  <span>قصص النجاح الخاصة بي</span>
                 </Link>
               </DropdownMenuItem>
 
@@ -134,12 +118,25 @@ export default function AuthMenu({ session }: { session: any }) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
+                <Link href="/my-orders">
+                  <ShoppingBag className="ml-2 h-4 w-4" />
+                  <span>طلباتي</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/coupons">
                   <QrCode className="ml-2 h-4 w-4" />
                   <span>كوبوناتي</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
+            <DropdownMenuItem asChild>
+              <Link href="/my-success-stories">
+                <Star className="ml-2 h-4 w-4" />
+                <span>قصص النجاح الخاصة بي</span>
+              </Link>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
 

@@ -75,7 +75,6 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
           const url = await uploadImageToSupabase(imageFile);
           values.imageUrl = url;
         }
-
         const response = await axios.patch(
           `/api/products/${params.id}`,
           values
@@ -83,8 +82,9 @@ const EditProductPage = ({ params }: { params: { id: string } }) => {
         console.log("API response:", response.data);
 
         toast.success("تم تعديل المنتج بنجاح");
-        router.refresh(); // Refresh the current route data
-        router.push("/my-products");
+
+        // Use window.location to force a full page reload and ensure fresh data
+        window.location.href = "/my-products";
       } catch (error: any) {
         console.error("Error updating product:", error);
         toast.error(

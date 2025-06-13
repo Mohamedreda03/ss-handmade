@@ -5,6 +5,7 @@ import { ar } from "date-fns/locale";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
 import {
@@ -130,7 +131,7 @@ export default async function MyEarningsPage() {
             لم يتم بيع أي منتجات حتى الآن.
           </p>
           <Link
-            href="/dashboard/products/new"
+            href="/my-products/new"
             className="mt-4 inline-block px-6 py-2 bg-primary text-white rounded-md"
           >
             أضف منتجًا جديدًا
@@ -156,6 +157,7 @@ export default async function MyEarningsPage() {
                   <TableHead className="text-right">الكمية</TableHead>
                   <TableHead className="text-right">إجمالي الإيراد</TableHead>
                   <TableHead className="text-right">حالة الدفع</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -167,12 +169,9 @@ export default async function MyEarningsPage() {
                       })}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link
-                        href={`/my-orders/${earning.orderId}`}
-                        className="text-blue-600 hover:underline"
-                      >
+                      <span className="font-mono text-sm">
                         {earning.orderId.slice(0, 8)}...
-                      </Link>
+                      </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end space-x-3 space-x-reverse">
@@ -222,6 +221,13 @@ export default async function MyEarningsPage() {
                           })}
                         </div>
                       )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/my-orders/${earning.orderId}`}>
+                          عرض الطلب
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

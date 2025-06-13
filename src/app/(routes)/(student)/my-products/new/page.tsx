@@ -74,10 +74,11 @@ const NewProductPage = () => {
         const url = await uploadImageToSupabase(imageFile);
         values.imageUrl = url;
       }
-
       await axios.post("/api/products", values);
       toast.success("تم إضافة المنتج بنجاح");
-      router.push("/my-products");
+
+      // Use window.location to force a full page reload and ensure fresh data
+      window.location.href = "/my-products";
     } catch (error) {
       toast.error("حدث خطأ ما");
       console.error(error);

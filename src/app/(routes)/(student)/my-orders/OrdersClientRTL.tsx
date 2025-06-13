@@ -272,7 +272,8 @@ export function OrdersClientRTL({
               </div>
 
               {filteredBuyerOrders.length === 0 &&
-                buyerStatusFilter !== "all" && (                  <div className="text-center py-8">
+                buyerStatusFilter !== "all" && (
+                  <div className="text-center py-8">
                     <p className="text-gray-500">
                       لا توجد طلبات بحالة &quot;
                       {statusLabels[buyerStatusFilter as OrderStatus]}&quot;
@@ -524,7 +525,9 @@ export function OrdersClientRTL({
 
                 {filteredSellerOrders.length === 0 &&
                   sellerStatusFilter !== "all" && (
-                    <div className="text-center py-8">                    <p className="text-gray-500">
+                    <div className="text-center py-8">
+                      {" "}
+                      <p className="text-gray-500">
                         لا توجد طلبات بحالة &quot;
                         {statusLabels[sellerStatusFilter as OrderStatus]}&quot;
                       </p>

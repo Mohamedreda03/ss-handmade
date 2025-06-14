@@ -4,11 +4,23 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Edit, Trash, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
+import { useState } from "react";
 
 export type Product = {
   id: string;
@@ -257,14 +269,11 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     header: ({ column }) => (
       <div className="text-center font-medium">الإجراءات</div>
-    ),
-    cell: function CellComponent({ row }) {
+    ),    cell: function CellComponent({ row }) {
       const router = useRouter();
       const product = row.original;
-
-      const handleDelete = async () => {
+      const [isDeleting, setIsDeleting] = useState(false);      const handleDelete = async () => {
         const orderCount = product.orderItems?.length || 0;
-        const couponCount = product.Coupon?.length || 0;
 
         // إذا كان لديه طلبات، لا تسمح بالحذف
         if (orderCount > 0) {
@@ -272,14 +281,8 @@ export const columns: ColumnDef<Product>[] = [
           return;
         }
 
-        let warningMessage = "هل أنت متأكد من حذف هذا المنتج؟";
-        if (couponCount > 0) {
-          warningMessage += `\n\nسيتم أيضاً حذف ${couponCount} كوبون مرتبط بهذا المنتج.`;
-        }
-
-        if (!confirm(warningMessage)) return;
-
         try {
+          setIsDeleting(true);
           const response = await axios.delete(
             `/api/admin/products/${product.id}`
           );
@@ -310,10 +313,11 @@ export const columns: ColumnDef<Product>[] = [
           } else {
             toast.error("حدث خطأ أثناء حذف المنتج");
           }
+        } finally {
+          setIsDeleting(false);
         }
-      };
-
-      const orderCount = product.orderItems?.length || 0;
+      };      const orderCount = product.orderItems?.length || 0;
+      const couponCount = product.Coupon?.length || 0;
       const canDelete = orderCount === 0;
 
       return (
@@ -328,22 +332,70 @@ export const columns: ColumnDef<Product>[] = [
             <Edit className="h-4 w-4 text-blue-600" />
           </Button>
 
-          <Button
-            variant={canDelete ? "destructive" : "secondary"}
-            size="sm"
-            onClick={handleDelete}
-            disabled={!canDelete}
-            title={
-              canDelete
-                ? "حذف المنتج"
-                : "لا يمكن الحذف - يوجد طلبات على هذا المنتج"
-            }
-            className={`h-8 w-8 p-0 ${
-              !canDelete ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={canDelete ? "destructive" : "secondary"}
+                size="sm"
+                disabled={!canDelete}
+                title={
+                  canDelete
+                    ? "حذف المنتج"
+                    : "لا يمكن الحذف - يوجد طلبات على هذا المنتج"
+                }
+                className={`h-8 w-8 p-0 ${
+                  !canDelete ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent dir="rtl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-right">
+                  تأكيد حذف المنتج
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-right">
+                  هل أنت متأكد من أنك تريد حذف المنتج &quot;{product.name}&quot;؟
+                  <br />
+                  {couponCount > 0 && (
+                    <>
+                      <br />
+                      <span className="text-amber-600">
+                        تحذير: سيتم أيضاً حذف {couponCount} كوبون مرتبط بهذا المنتج.
+                      </span>
+                    </>
+                  )}
+                  <br />
+                  <span className="text-red-600 font-medium">
+                    هذا الإجراء لا يمكن التراجع عنه.
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>
+                  إلغاء
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="h-4 w-4 ml-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      جاري الحذف...
+                    </>
+                  ) : (
+                    <>
+                      <Trash className="h-4 w-4 ml-2" />
+                      حذف المنتج
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       );
     },

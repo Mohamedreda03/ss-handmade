@@ -28,16 +28,19 @@ export default function ChapterPage({
   if (isLoading) {
     return <Loading className="h-[70vh]" />;
   }
-
   // تحديد ما إذا كان يمكن حذف الفصل والدروس
   const canDeleteContent = () => {
-    if (
-      data?.currentUser?.role === "ADMIN" &&
-      data?.chapter?.course?.User?.role === "CONSTRUCTOR"
-    ) {
-      return false;
+    // المشرف (ADMIN) يمكنه حذف أي محتوى
+    if (data?.currentUser?.role === "ADMIN") {
+      return true;
     }
-    return true;
+
+    // المدرس (CONSTRUCTOR) يمكنه حذف محتواه فقط
+    if (data?.currentUser?.role === "CONSTRUCTOR") {
+      return data?.chapter?.course?.userId === data?.currentUser?.id;
+    }
+
+    return false;
   };
 
   return (

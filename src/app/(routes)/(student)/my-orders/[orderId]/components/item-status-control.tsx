@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { OrderStatus } from "@prisma/client";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "react-query";
 import {
   Select,
   SelectContent,
@@ -32,15 +34,25 @@ const statusColors: Record<OrderStatus, string> = {
 interface ItemStatusControlProps {
   itemId: string;
   currentStatus: OrderStatus;
+  orderId: string; // إضافة orderId
 }
 
 export default function ItemStatusControl({
   itemId,
   currentStatus,
+  orderId,
 }: ItemStatusControlProps) {
   const [status, setStatus] = useState<OrderStatus>(currentStatus);
   const [isUpdating, setIsUpdating] = useState(false);
   const [hasChanged, setHasChanged] = useState(false);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // تزامن الحالة المحلية مع البيانات الجديدة من API
+  useEffect(() => {
+    setStatus(currentStatus);
+    setHasChanged(false);
+  }, [currentStatus]);
 
   const handleStatusChange = (newStatus: OrderStatus) => {
     if (newStatus !== status) {
@@ -48,17 +60,40 @@ export default function ItemStatusControl({
       setHasChanged(true);
     }
   };
-
   const updateItemStatus = async () => {
     try {
       setIsUpdating(true);
 
-      await axios.patch(`/api/order-items/${itemId}`, { status });
+      console.log("🔄 بدء تحديث حالة العنصر من الواجهة:", {
+        itemId,
+        orderId,
+        oldStatus: currentStatus,
+        newStatus: status,
+      });
+
+      const response = await axios.patch(`/api/order-items/${itemId}`, {
+        status,
+      });
+
+      console.log("✅ استجابة API:", response.data);
 
       toast.success("تم تحديث حالة المنتج بنجاح");
       setHasChanged(false);
+
+      // إبطال cache وإعادة جلب البيانات فورياً
+      console.log("🔄 إبطال cache وإعادة جلب البيانات للطلب:", orderId);
+      await queryClient.invalidateQueries(["order", orderId]);
+      await queryClient.invalidateQueries(["orders"]);
+
+      // إعادة جلب البيانات فورياً لضمان التحديث
+      await queryClient.refetchQueries(["order", orderId]);
+
+      console.log("🔄 تم إبطال cache وإعادة جلب البيانات");
     } catch (error) {
-      console.error("Error updating item status:", error);
+      console.error("❌ خطأ في تحديث حالة العنصر:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("تفاصيل الخطأ:", error.response?.data);
+      }
       toast.error("حدث خطأ أثناء تحديث حالة المنتج");
     } finally {
       setIsUpdating(false);

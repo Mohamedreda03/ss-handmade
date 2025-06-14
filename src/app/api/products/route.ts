@@ -11,11 +11,10 @@ export async function GET(request: Request) {
     const sort = url.searchParams.get("sort") || "newest";
     const productType = url.searchParams.get("productType") || "all";
     const page = parseInt(url.searchParams.get("page") || "1");
-    const pageSize = 12; // Number of products per page
-
-    // Build where clause based on filters
+    const pageSize = 12; // Number of products per page    // Build where clause based on filters
     const whereClause: any = {
       isAvailable: true,
+      approvalStatus: "APPROVED", // Only show approved products
     };
 
     // Add search filter

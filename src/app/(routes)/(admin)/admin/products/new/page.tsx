@@ -18,6 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -45,6 +52,9 @@ const formSchema = z.object({
     .optional()
     .or(z.literal("")),
   isAvailable: z.boolean().default(true),
+  type: z.enum(["HANDMADE", "EQUIPMENT"], {
+    required_error: "يرجى اختيار نوع المنتج",
+  }),
 });
 
 const NewProductPage = () => {
@@ -52,7 +62,6 @@ const NewProductPage = () => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,6 +71,7 @@ const NewProductPage = () => {
       stock: 0,
       imageUrl: "",
       isAvailable: true,
+      type: "HANDMADE",
     },
   });
 
@@ -136,7 +146,7 @@ const NewProductPage = () => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />{" "}
             <FormField
               control={form.control}
               name="description"
@@ -150,6 +160,38 @@ const NewProductPage = () => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نوع المنتج</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="اختر نوع المنتج"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="HANDMADE">منتج يدوي</SelectItem>
+                      <SelectItem value="EQUIPMENT">أدوات ومعدات</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    اختر ما إذا كان هذا منتجاً يدوياً أم أدوات ومعدات
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

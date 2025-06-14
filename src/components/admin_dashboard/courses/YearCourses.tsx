@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DeleteAlert from "../DeleteAlert";
 import { Card } from "@/components/ui/card";
+import { Trash2 } from "lucide-react";
 import React from "react";
 
 interface CourseWithUser extends Course {
@@ -24,13 +25,19 @@ export default function YearCourses({
 }: YearCoursesProps) {
   // تحديد ما إذا كان يمكن حذف الكورس
   const canDeleteCourse = (course: CourseWithUser) => {
-    // إذا كان المستخدم الحالي admin والكورس مملوك لـ contractor، لا يمكن الحذف
-    if (currentUser?.role === "ADMIN" && course.User?.role === "CONSTRUCTOR") {
-      return false;
+    // المشرف (ADMIN) يمكنه حذف أي كورس
+    if (currentUser?.role === "ADMIN") {
+      return true;
     }
-    // إذا كان المستخدم admin والكورس مملوك لـ admin، يمكن الحذف
-    // إذا كان المستخدم contractor والكورس مملوك له، يمكن الحذف
-    return true;
+    // المدرس (CONSTRUCTOR) يمكنه حذف كورساته فقط
+    if (
+      currentUser?.role === "CONSTRUCTOR" &&
+      course.userId === currentUser.id
+    ) {
+      return true;
+    }
+    // في باقي الحالات، لا يمكن الحذف
+    return false;
   };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 h-full">
@@ -50,11 +57,27 @@ export default function YearCourses({
                   </div>
                 ) : (
                   <div className="h-[270px] bg-gray-200 rounded-md mb-3" />
-                )}
+                )}{" "}
                 <div>
                   <h1 className="text-xl font-semibold mt-3 border-b-2 border-secondary w-fit mb-2">
                     {course?.title}
                   </h1>
+                  {/* إضافة معلومات صاحب الكورس للمشرف */}
+                  {currentUser?.role === "ADMIN" && course.User && (
+                    <div className="mb-2">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          course.User.role === "ADMIN"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {course.User.role === "ADMIN"
+                          ? "كورس المشرف"
+                          : "كورس المدرس"}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div
                   className="html-content"
@@ -64,16 +87,20 @@ export default function YearCourses({
                 />{" "}
                 <div className="mt-4 border-t pt-4 flex flex-wrap items-center gap-3">
                   <Link href={`/admin/courses/${course?.id}`}>
-                    <Button>تعديل الكورس</Button>
+                    <Button variant="default" size="sm">
+                      تعديل الكورس
+                    </Button>
                   </Link>
                   <Link href={`/admin/courses/${course?.id}/sub`}>
-                    <Button>بيانات المشتركين</Button>
+                    <Button variant="outline" size="sm">
+                      بيانات المشتركين
+                    </Button>
                   </Link>
                   {canDeleteCourse(course) && (
                     <DeleteAlert
-                      buttonTitle="مسح الكورس"
-                      dialogTitle="هل انت متأكد من حذف الكورس!"
-                      dialogDescription="سيتم حذف جميع بيانات الكورس نهائيا"
+                      buttonTitle="حذف الكورس"
+                      dialogTitle="هل أنت متأكد من حذف الكورس؟"
+                      dialogDescription={`سيتم حذف الكورس "${course?.title}" وجميع محتوياته (الفصول والدروس) نهائياً. هذا الإجراء لا يمكن التراجع عنه.`}
                       apiEndpoint={`/api/courses/${course?.id}`}
                       toastMessage="تم حذف الكورس بنجاح"
                       redirect="/admin/courses"

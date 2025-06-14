@@ -10,7 +10,6 @@ export async function GET(
     const session = await auth();
     const isUserAuth = session ? true : false;
     const isUserAdmin = session?.user.role === "ADMIN";
-
     const [chapters, subscription, assignments] = await Promise.all([
       prisma.chapter.findMany({
         where: {
@@ -22,9 +21,9 @@ export async function GET(
         },
         include: {
           Lesson: {
-            where: {
-              isPublished: true,
-            },
+            where: isUserAdmin
+              ? {} // المديرين يرون جميع الدروس
+              : { isPublished: true }, // المستخدمين العاديين يرون المنشور فقط
             orderBy: {
               position: "asc",
             },

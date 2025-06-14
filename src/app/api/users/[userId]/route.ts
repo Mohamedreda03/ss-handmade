@@ -52,3 +52,66 @@ export async function PATCH(
     return new NextResponse("internal server error", { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  try {
+    const session = await auth();
+
+    // التحقق من أن المستخدم مشرف
+    if (!session || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { userId } = params;
+
+    // التحقق من وجود المستخدم
+    const userToDelete = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!userToDelete) {
+      return new NextResponse("User not found", { status: 404 });
+    }
+
+    // منع المشرف من حذف نفسه
+    if (userToDelete.id === session.user.id) {
+      return new NextResponse("Cannot delete your own account", {
+        status: 400,
+      });
+    }
+
+    // حذف المستخدم مع جميع البيانات المرتبطة
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    console.log(`User deleted successfully:`, {
+      deletedUserId: userToDelete.id,
+      deletedUserName: userToDelete.name,
+      deletedUserRole: userToDelete.role,
+      deletedBy: session.user.id,
+    });
+
+    return NextResponse.json({
+      message: "User deleted successfully",
+      deletedUser: {
+        id: userToDelete.id,
+        name: userToDelete.name,
+        email: userToDelete.email,
+        role: userToDelete.role,
+      },
+    });
+  } catch (error) {
+    console.error("ERROR IN DELETE USER:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -124,8 +124,7 @@ export default function SuccessStoriesPage() {
       console.error("Error fetching filters:", error);
     }
   };
-
-  const fetchStories = async (page = 1) => {
+  const fetchStories = useCallback(async (page = 1) => {
     try {
       setIsLoading(true);
 
@@ -162,11 +161,10 @@ export default function SuccessStoriesPage() {
     } catch (error) {
       console.error("Error fetching success stories:", error);
       setStories(fallbackStories as unknown as SuccessStory[]);
-      setPagination(null);
-    } finally {
+      setPagination(null);    } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedProfession, selectedCourse, sortBy]);
 
   useEffect(() => {
     fetchFilters();
@@ -174,10 +172,9 @@ export default function SuccessStoriesPage() {
 
   useEffect(() => {
     setCurrentPage(1); // إعادة تعيين الصفحة عند تغيير الفلاتر
-  }, [selectedProfession, selectedCourse, sortBy]);
-  useEffect(() => {
+  }, [selectedProfession, selectedCourse, sortBy]);  useEffect(() => {
     fetchStories(currentPage);
-  }, [currentPage, selectedProfession, selectedCourse, sortBy]);
+  }, [currentPage, fetchStories]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || (pagination && page > pagination.totalPages)) return;

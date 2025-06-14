@@ -79,9 +79,7 @@ export async function DELETE(
 
     if (!chapterAccess) {
       return new NextResponse("Chapter not found", { status: 404 });
-    }
-
-    // إذا كان constructor، يجب أن يكون مالك الكورس
+    } // إذا كان constructor، يجب أن يكون مالك الكورس
     if (
       session.user.role === "CONSTRUCTOR" &&
       chapterAccess.course.userId !== session.user.id
@@ -89,15 +87,7 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // إذا كان admin ولكن الكورس مملوك لـ contractor، منع الحذف
-    if (
-      session.user.role === "ADMIN" &&
-      chapterAccess.course.User?.role === "CONSTRUCTOR"
-    ) {
-      return new NextResponse("Cannot delete contractor content", {
-        status: 403,
-      });
-    } // استرجاع الـ Chapter والعلاقات المرتبطة
+    // المشرف (ADMIN) يمكنه حذف أي محتوى// استرجاع الـ Chapter والعلاقات المرتبطة
     const chapter = await prisma.chapter.findUnique({
       where: {
         id: chapterId,

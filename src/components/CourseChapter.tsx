@@ -23,6 +23,7 @@ export default function CourseChapter({
   isUserAdmin: boolean;
 }) {
   const lessons = chapter.Lesson;
+
   return (
     <AccordionItem
       value={chapter?.id}
@@ -36,20 +37,28 @@ export default function CourseChapter({
             {chapter?.title}
           </h3>
         </div>
-      </AccordionTrigger>
+      </AccordionTrigger>{" "}
       <AccordionContent className="mt-5 bg-accent/30 dark:bg-accent/10 p-4 rounded-lg border border-primary/20">
-        <Accordion type="single" collapsible className="w-full space-y-3">
-          {lessons?.map((lesson: any) => (
-            <ChapterLesson
-              key={lesson?.id}
-              lesson={lesson}
-              courseId={courseId}
-              isOwned={isOwned}
-              isUserAuth={isUserAuth}
-              isUserAdmin={isUserAdmin}
-            />
-          ))}
-        </Accordion>
+        {lessons && lessons.length > 0 ? (
+          <Accordion type="single" collapsible className="w-full space-y-3">
+            {lessons.map((lesson: any) => (
+              <ChapterLesson
+                key={lesson?.id}
+                lesson={lesson}
+                courseId={courseId}
+                isOwned={isOwned}
+                isUserAuth={isUserAuth}
+                isUserAdmin={isUserAdmin}
+              />
+            ))}
+          </Accordion>
+        ) : (
+          <div className="text-center py-6">
+            <p className="text-muted-foreground">
+              لا توجد دروس متاحة في هذا الفصل حالياً
+            </p>
+          </div>
+        )}
       </AccordionContent>
     </AccordionItem>
   );

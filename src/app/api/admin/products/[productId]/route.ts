@@ -34,8 +34,8 @@ export async function PATCH(
 ) {
   try {
     const body = await req.json();
-    const { name, description, price, imageUrl, stock, isAvailable } = body;
-
+    const { name, description, price, imageUrl, stock, isAvailable, type } =
+      body;
     console.log("PATCH request received:", {
       name,
       description,
@@ -43,6 +43,7 @@ export async function PATCH(
       imageUrl,
       stock: { value: stock, type: typeof stock },
       isAvailable,
+      type,
     });
 
     const session = await auth();
@@ -95,7 +96,6 @@ export async function PATCH(
       }
       updateData.stock = numStock;
     }
-
     if (isAvailable !== undefined) {
       if (typeof isAvailable !== "boolean") {
         return new NextResponse("حالة التوفر يجب أن تكون true أو false", {
@@ -103,6 +103,18 @@ export async function PATCH(
         });
       }
       updateData.isAvailable = isAvailable;
+    }
+
+    if (type !== undefined) {
+      if (!["HANDMADE", "EQUIPMENT"].includes(type)) {
+        return new NextResponse(
+          "نوع المنتج يجب أن يكون HANDMADE أو EQUIPMENT",
+          {
+            status: 400,
+          }
+        );
+      }
+      updateData.type = type;
     }
 
     console.log("Update data:", updateData);

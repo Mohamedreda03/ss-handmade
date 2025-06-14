@@ -19,6 +19,7 @@ export type Product = {
   stock: number;
   isAvailable: boolean;
   type: "HANDMADE" | "EQUIPMENT";
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   updatedAt: string;
   orderItems?: Array<{
@@ -115,6 +116,69 @@ export const columns: ColumnDef<Product>[] = [
     size: 120,
   },
   {
+    accessorKey: "type",
+    header: ({ column }) => (
+      <div className="text-center font-medium">نوع المنتج</div>
+    ),
+    cell: ({ row }) => {
+      const type = row.original.type;
+      return (
+        <div className="text-center">
+          <Badge
+            variant={type === "HANDMADE" ? "default" : "secondary"}
+            className={
+              type === "HANDMADE"
+                ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+            }
+          >
+            {type === "HANDMADE" ? "يدوي" : "معدات"}
+          </Badge>
+        </div>
+      );
+    },
+    size: 120,
+  },
+  {
+    accessorKey: "approvalStatus",
+    header: ({ column }) => (
+      <div className="text-center font-medium">حالة الموافقة</div>
+    ),
+    cell: ({ row }) => {
+      const status = row.original.approvalStatus;
+      const getStatusConfig = (status: string) => {
+        switch (status) {
+          case "APPROVED":
+            return {
+              text: "مقبول",
+              className: "bg-green-100 text-green-800 hover:bg-green-200",
+            };
+          case "REJECTED":
+            return {
+              text: "مرفوض",
+              className: "bg-red-100 text-red-800 hover:bg-red-200",
+            };
+          case "PENDING":
+          default:
+            return {
+              text: "في انتظار الموافقة",
+              className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+            };
+        }
+      };
+
+      const config = getStatusConfig(status);
+      return (
+        <div className="text-center">
+          <Badge variant="secondary" className={config.className}>
+            {config.text}
+          </Badge>
+        </div>
+      );
+    },
+    size: 150,
+  },
+  {
     accessorKey: "stock",
     header: ({ column }) => (
       <div className="text-center font-medium">المخزون</div>
@@ -138,6 +202,27 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     size: 100,
+  },
+  {
+    accessorKey: "User",
+    header: ({ column }) => (
+      <div className="text-center font-medium">منشئ المنتج</div>
+    ),
+    cell: ({ row }) => {
+      const user = row.original.User;
+      return (
+        <div className="text-center">
+          {user ? (
+            <Badge variant="outline" className="text-slate-700">
+              {user.name}
+            </Badge>
+          ) : (
+            <span className="text-gray-500 text-sm">غير محدد</span>
+          )}
+        </div>
+      );
+    },
+    size: 150,
   },
   {
     id: "orderCount",

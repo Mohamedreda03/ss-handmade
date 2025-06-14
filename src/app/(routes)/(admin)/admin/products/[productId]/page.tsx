@@ -18,6 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -42,6 +49,9 @@ const formSchema = z.object({
     .refine((val) => val >= 0, "الكمية يجب أن تكون رقم موجب أو صفر"),
   imageUrl: z.string().optional().or(z.literal("")),
   isAvailable: z.boolean().default(true),
+  type: z.enum(["HANDMADE", "EQUIPMENT"], {
+    required_error: "يرجى اختيار نوع المنتج",
+  }),
 });
 
 const EditProductPage = ({ params }: { params: { productId: string } }) => {
@@ -49,7 +59,6 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
   const queryClient = useQueryClient();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,6 +68,7 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
       stock: 0,
       imageUrl: "",
       isAvailable: true,
+      type: "HANDMADE",
     },
   });
 
@@ -84,6 +94,7 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
           stock: data.stock,
           imageUrl: data.imageUrl || "",
           isAvailable: data.isAvailable,
+          type: data.type || "HANDMADE",
         });
 
         // Set image preview if the product has an image
@@ -251,6 +262,38 @@ const EditProductPage = ({ params }: { params: { productId: string } }) => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نوع المنتج</FormLabel>
+                  <Select
+                    disabled={updateProductMutation.isLoading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="اختر نوع المنتج"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="HANDMADE">منتج يدوي</SelectItem>
+                      <SelectItem value="EQUIPMENT">أدوات ومعدات</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    اختر ما إذا كان هذا منتجاً يدوياً أم أدوات ومعدات
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

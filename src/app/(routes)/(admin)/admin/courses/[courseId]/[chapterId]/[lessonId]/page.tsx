@@ -32,16 +32,19 @@ export default function LessonPage({
   if (isLoading) {
     return <Loading className="h-[70vh]" />;
   }
-
   // تحديد ما إذا كان يمكن حذف الدرس
   const canDeleteContent = () => {
-    if (
-      data?.currentUser?.role === "ADMIN" &&
-      data?.lesson?.chapter?.course?.User?.role === "CONSTRUCTOR"
-    ) {
-      return false;
+    // المشرف (ADMIN) يمكنه حذف أي محتوى
+    if (data?.currentUser?.role === "ADMIN") {
+      return true;
     }
-    return true;
+
+    // المدرس (CONSTRUCTOR) يمكنه حذف محتواه فقط
+    if (data?.currentUser?.role === "CONSTRUCTOR") {
+      return data?.lesson?.chapter?.course?.userId === data?.currentUser?.id;
+    }
+
+    return false;
   };
 
   return (

@@ -13,6 +13,7 @@ import {
   Star,
   HardHat,
   ClipboardCheck,
+  CheckCircle,
 } from "lucide-react";
 
 interface MenuData {
@@ -80,6 +81,13 @@ export const admin_menu_data: MenuData[] = [
     link: `/admin/products`,
     title: "المنتجات",
     Icon: Package,
+    role: ["ADMIN"],
+  },
+  {
+    id: 7.5,
+    link: `/admin/products-approval`,
+    title: "موافقة المنتجات",
+    Icon: CheckCircle,
     role: ["ADMIN"],
   },
   {

@@ -22,25 +22,45 @@ import Loading from "@/components/Loading";
 const ProductsPage = () => {
   const router = useRouter();
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
+  const [productTypeFilter, setProductTypeFilter] = useState("all");
+  const [approvalStatusFilter, setApprovalStatusFilter] = useState("APPROVED"); // عرض المنتجات المقبولة فقط بشكل افتراضي
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true); // تفعيل التحميل عند تغيير الفلاتر
       try {
-        // يمكنك إما استخدام البحث في الخادم أو البحث المحلي
-        // للبحث في الخادم، استخدم المعاملات أدناه:
-        // const params = new URLSearchParams();
-        // if (searchTerm) params.append('search', searchTerm);
-        // if (availabilityFilter !== 'all') params.append('availability', availabilityFilter);
-        // if (stockFilter !== 'all') params.append('stockFilter', stockFilter);
-        // const response = await axios.get(`/api/admin/products?${params}`);
+        // بناء المعايير للـ API
+        const params = new URLSearchParams();
 
-        const response = await axios.get("/api/admin/products");
-        setProducts(response.data);
-        setFilteredProducts(response.data);
+        if (searchTerm.trim()) {
+          params.append("search", searchTerm.trim());
+        }
+
+        if (availabilityFilter !== "all") {
+          params.append("availability", availabilityFilter);
+        }
+
+        if (stockFilter !== "all") {
+          params.append("stockFilter", stockFilter);
+        }
+
+        if (productTypeFilter !== "all") {
+          params.append("productType", productTypeFilter);
+        }
+        if (approvalStatusFilter !== "all") {
+          params.append("approvalStatus", approvalStatusFilter);
+        }
+
+        const url = `/api/admin/products${
+          params.toString() ? `?${params.toString()}` : ""
+        }`;
+        const response = await axios.get(url);
+        // التعامل مع الهيكل الجديد للـ API response
+        const productsData = response.data.data || response.data;
+        setProducts(productsData);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -49,64 +69,30 @@ const ProductsPage = () => {
     };
 
     fetchProducts();
-  }, []);
-  // البحث والفلترة في المنتجات
-  useEffect(() => {
-    let filtered = products;
-
-    // فلترة حسب النص المدخل
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(
-        (product: any) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())) ||
-          product.price.toString().includes(searchTerm) ||
-          product.stock.toString().includes(searchTerm)
-      );
-    }
-
-    // فلترة حسب التوفر
-    if (availabilityFilter !== "all") {
-      filtered = filtered.filter((product: any) =>
-        availabilityFilter === "available"
-          ? product.isAvailable
-          : !product.isAvailable
-      );
-    }
-
-    // فلترة حسب المخزون
-    if (stockFilter !== "all") {
-      filtered = filtered.filter((product: any) => {
-        switch (stockFilter) {
-          case "in_stock":
-            return product.stock > 0;
-          case "low_stock":
-            return product.stock > 0 && product.stock <= 10;
-          case "out_of_stock":
-            return product.stock === 0;
-          default:
-            return true;
-        }
-      });
-    }
-
-    setFilteredProducts(filtered);
-  }, [searchTerm, availabilityFilter, stockFilter, products]);
-
+  }, [
+    searchTerm,
+    availabilityFilter,
+    stockFilter,
+    productTypeFilter,
+    approvalStatusFilter,
+  ]); // إزالة منطق الفلترة المحلية لأن الفلترة تتم من جانب الخادم
+  // useEffect(() => {
+  //   // الفلترة تتم من جانب الخادم الآن
+  // }, [searchTerm, availabilityFilter, stockFilter, productTypeFilter, approvalStatusFilter, products]);
   const clearFilters = () => {
     setSearchTerm("");
     setAvailabilityFilter("all");
     setStockFilter("all");
+    setProductTypeFilter("all");
+    setApprovalStatusFilter("all");
   };
   return (
     <div className="p-6">
       <div className="flex items-center justify-between">
+        {" "}
         <Heading
-          title={`المنتجات (${filteredProducts.length})`}
-          description="قائمة بجميع المنتجات المتاحة"
+          title={`المنتجات (${products.length})`}
+          description="قائمة بالمنتجات المقبولة والمتاحة للعملاء"
         />
         <Button onClick={() => router.push("/admin/products/new")}>
           <Plus className="mr-2 h-4 w-4" />
@@ -125,7 +111,6 @@ const ProductsPage = () => {
               className="pl-10 pr-4"
             />
           </div>
-
           <Select
             value={availabilityFilter}
             onValueChange={setAvailabilityFilter}
@@ -138,8 +123,7 @@ const ProductsPage = () => {
               <SelectItem value="available">متاح</SelectItem>
               <SelectItem value="unavailable">غير متاح</SelectItem>
             </SelectContent>
-          </Select>
-
+          </Select>{" "}
           <Select value={stockFilter} onValueChange={setStockFilter}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="المخزون" />
@@ -151,10 +135,38 @@ const ProductsPage = () => {
               <SelectItem value="out_of_stock">نفد المخزون</SelectItem>
             </SelectContent>
           </Select>
-
+          <Select
+            value={productTypeFilter}
+            onValueChange={setProductTypeFilter}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="نوع المنتج" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الأنواع</SelectItem>
+              <SelectItem value="HANDMADE">يدوي</SelectItem>
+              <SelectItem value="EQUIPMENT">معدات</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={approvalStatusFilter}
+            onValueChange={setApprovalStatusFilter}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="حالة الموافقة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الحالات</SelectItem>
+              <SelectItem value="PENDING">في انتظار الموافقة</SelectItem>
+              <SelectItem value="APPROVED">مقبول</SelectItem>
+              <SelectItem value="REJECTED">مرفوض</SelectItem>
+            </SelectContent>
+          </Select>
           {(searchTerm ||
             availabilityFilter !== "all" ||
-            stockFilter !== "all") && (
+            stockFilter !== "all" ||
+            productTypeFilter !== "all" ||
+            approvalStatusFilter !== "all") && (
             <Button
               variant="outline"
               size="sm"
@@ -168,12 +180,13 @@ const ProductsPage = () => {
         </div>
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div>
-            عرض {filteredProducts.length} من أصل {products.length} منتج
-          </div>
+          {" "}
+          <div>عرض {products.length} منتج</div>
           {(searchTerm ||
             availabilityFilter !== "all" ||
-            stockFilter !== "all") && (
+            stockFilter !== "all" ||
+            productTypeFilter !== "all" ||
+            approvalStatusFilter !== "all") && (
             <div className="text-blue-600">الفلاتر مُفعّلة</div>
           )}
         </div>
@@ -183,7 +196,7 @@ const ProductsPage = () => {
       ) : (
         <div className="mt-6">
           <div className="rounded-md border bg-card">
-            <DataTable columns={columns} data={filteredProducts} />
+            <DataTable columns={columns} data={products} />
           </div>
         </div>
       )}

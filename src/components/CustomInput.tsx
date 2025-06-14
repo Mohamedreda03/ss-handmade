@@ -30,7 +30,11 @@ export default function CustomInput({
 }: CustomInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPasswordField = type === "password";
-  const inputType = isPasswordField ? (showPassword ? "text" : "password") : type || "text";
+  const inputType = isPasswordField
+    ? showPassword
+      ? "text"
+      : "password"
+    : type || "text";
 
   return (
     <FormField
@@ -74,7 +78,8 @@ export default function CustomInput({
                         !error,
                     })}
                   />
-                </div>                <Input
+                </div>{" "}
+                <Input
                   {...field}
                   type={inputType}
                   className={cn(
@@ -108,11 +113,7 @@ export default function CustomInput({
                     disabled={disabled}
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
-                    )}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 )}
               </div>

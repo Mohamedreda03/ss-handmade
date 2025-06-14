@@ -123,7 +123,8 @@ export default function UpdateUser({ user }: UpdateUserRoleProps) {
           <div className="grid gap-5 lg:grid-cols-2 grid-cols-1">
             <FormField
               control={form.control}
-              name="password"              render={({ field }) => (
+              name="password"
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>كلمة المرور الجديدة (اختياري)</FormLabel>
                   <PasswordInput

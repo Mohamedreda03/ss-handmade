@@ -269,10 +269,12 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     header: ({ column }) => (
       <div className="text-center font-medium">الإجراءات</div>
-    ),    cell: function CellComponent({ row }) {
+    ),
+    cell: function CellComponent({ row }) {
       const router = useRouter();
       const product = row.original;
-      const [isDeleting, setIsDeleting] = useState(false);      const handleDelete = async () => {
+      const [isDeleting, setIsDeleting] = useState(false);
+      const handleDelete = async () => {
         const orderCount = product.orderItems?.length || 0;
 
         // إذا كان لديه طلبات، لا تسمح بالحذف
@@ -316,7 +318,8 @@ export const columns: ColumnDef<Product>[] = [
         } finally {
           setIsDeleting(false);
         }
-      };      const orderCount = product.orderItems?.length || 0;
+      };
+      const orderCount = product.orderItems?.length || 0;
       const couponCount = product.Coupon?.length || 0;
       const canDelete = orderCount === 0;
 
@@ -356,13 +359,15 @@ export const columns: ColumnDef<Product>[] = [
                   تأكيد حذف المنتج
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-right">
-                  هل أنت متأكد من أنك تريد حذف المنتج &quot;{product.name}&quot;؟
+                  هل أنت متأكد من أنك تريد حذف المنتج &quot;{product.name}
+                  &quot;؟
                   <br />
                   {couponCount > 0 && (
                     <>
                       <br />
                       <span className="text-amber-600">
-                        تحذير: سيتم أيضاً حذف {couponCount} كوبون مرتبط بهذا المنتج.
+                        تحذير: سيتم أيضاً حذف {couponCount} كوبون مرتبط بهذا
+                        المنتج.
                       </span>
                     </>
                   )}

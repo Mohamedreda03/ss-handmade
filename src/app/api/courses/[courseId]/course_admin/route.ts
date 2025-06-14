@@ -29,7 +29,8 @@ export async function GET(
       courseAccess.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }    const [course, items] = await Promise.all([
+    }
+    const [course, items] = await Promise.all([
       prisma.course.findUnique({
         where: {
           id: courseId,

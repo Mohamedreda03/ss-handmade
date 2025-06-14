@@ -27,7 +27,8 @@ export default function CourseHead({
     <div className="flex items-center justify-between mt-3 mb-10">
       <h1 className="text-3xl font-semibold">
         {course.name} ({filledFields}/{totalFields})
-      </h1>      <div className="flex items-center">
+      </h1>{" "}
+      <div className="flex items-center">
         {canDelete && (
           <DeleteAlert
             buttonTitle="مسح الكورس"

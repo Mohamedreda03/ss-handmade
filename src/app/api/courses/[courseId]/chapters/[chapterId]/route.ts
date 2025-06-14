@@ -62,7 +62,7 @@ export async function DELETE(
     const session = await auth();
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }    // التحقق من صلاحية حذف الفصل
+    } // التحقق من صلاحية حذف الفصل
     const chapterAccess = await prisma.chapter.findUnique({
       where: { id: chapterId },
       include: {
@@ -94,8 +94,10 @@ export async function DELETE(
       session.user.role === "ADMIN" &&
       chapterAccess.course.User?.role === "CONSTRUCTOR"
     ) {
-      return new NextResponse("Cannot delete contractor content", { status: 403 });
-    }// استرجاع الـ Chapter والعلاقات المرتبطة
+      return new NextResponse("Cannot delete contractor content", {
+        status: 403,
+      });
+    } // استرجاع الـ Chapter والعلاقات المرتبطة
     const chapter = await prisma.chapter.findUnique({
       where: {
         id: chapterId,
@@ -157,7 +159,8 @@ export async function GET(
           status: 401,
         });
       }
-    }    const chapter = await prisma.chapter.findFirst({
+    }
+    const chapter = await prisma.chapter.findFirst({
       where: {
         id: chapterId,
       },

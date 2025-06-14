@@ -18,7 +18,10 @@ interface YearCoursesProps {
   currentUser: User | null;
 }
 
-export default function YearCourses({ courses, currentUser }: YearCoursesProps) {
+export default function YearCourses({
+  courses,
+  currentUser,
+}: YearCoursesProps) {
   // تحديد ما إذا كان يمكن حذف الكورس
   const canDeleteCourse = (course: CourseWithUser) => {
     // إذا كان المستخدم الحالي admin والكورس مملوك لـ contractor، لا يمكن الحذف
@@ -53,13 +56,13 @@ export default function YearCourses({ courses, currentUser }: YearCoursesProps) 
                     {course?.title}
                   </h1>
                 </div>
-
                 <div
                   className="html-content"
                   dangerouslySetInnerHTML={{
                     __html: course?.description || "",
                   }}
-                />                <div className="mt-4 border-t pt-4 flex flex-wrap items-center gap-3">
+                />{" "}
+                <div className="mt-4 border-t pt-4 flex flex-wrap items-center gap-3">
                   <Link href={`/admin/courses/${course?.id}`}>
                     <Button>تعديل الكورس</Button>
                   </Link>

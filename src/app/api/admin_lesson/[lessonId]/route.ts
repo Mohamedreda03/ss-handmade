@@ -34,7 +34,8 @@ export async function GET(
 
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }    const lesson = await prisma.lesson.findFirst({
+    }
+    const lesson = await prisma.lesson.findFirst({
       where: {
         id: lessonId,
       },
@@ -58,7 +59,7 @@ export async function GET(
 
     if (!lesson) {
       return new NextResponse("Lesson not found", { status: 404 });
-    }    // إذا كان constructor، يجب أن يكون مالك الكورس
+    } // إذا كان constructor، يجب أن يكون مالك الكورس
     if (
       session.user.role === "CONSTRUCTOR" &&
       lesson.chapter.course.userId !== session.user.id

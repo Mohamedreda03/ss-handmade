@@ -31,7 +31,10 @@ export default function ChapterPage({
 
   // تحديد ما إذا كان يمكن حذف الفصل والدروس
   const canDeleteContent = () => {
-    if (data?.currentUser?.role === "ADMIN" && data?.chapter?.course?.User?.role === "CONSTRUCTOR") {
+    if (
+      data?.currentUser?.role === "ADMIN" &&
+      data?.chapter?.course?.User?.role === "CONSTRUCTOR"
+    ) {
       return false;
     }
     return true;
@@ -46,7 +49,8 @@ export default function ChapterPage({
         >
           <ArrowRight className="h-4 w-4 cursor-pointer" />
           <span>العودة لاعدادات الكورس</span>
-        </Link>        <div className="flex items-center">
+        </Link>{" "}
+        <div className="flex items-center">
           <span className="border-b border-secondary text-2xl ml-4">
             {data?.chapter?.title}
           </span>
@@ -79,7 +83,8 @@ export default function ChapterPage({
             courseId={courseId}
             chapterId={chapterId}
           />
-        </div>        <div className="md:flex-1 flex flex-col gap-5">
+        </div>{" "}
+        <div className="md:flex-1 flex flex-col gap-5">
           <EditLessons
             items={data?.lessons as any[]}
             courseId={courseId}

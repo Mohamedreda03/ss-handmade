@@ -67,7 +67,7 @@ export async function DELETE(
     const session = await auth();
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }    // التحقق من صلاحية حذف الدرس
+    } // التحقق من صلاحية حذف الدرس
     const lessonAccess = await prisma.lesson.findUnique({
       where: { id: lessonId },
       include: {
@@ -103,7 +103,9 @@ export async function DELETE(
       session.user.role === "ADMIN" &&
       lessonAccess.chapter.course.User?.role === "CONSTRUCTOR"
     ) {
-      return new NextResponse("Cannot delete contractor content", { status: 403 });
+      return new NextResponse("Cannot delete contractor content", {
+        status: 403,
+      });
     }
     const lesson = await prisma.lesson.findUnique({
       where: {

@@ -35,7 +35,10 @@ export default function LessonPage({
 
   // تحديد ما إذا كان يمكن حذف الدرس
   const canDeleteContent = () => {
-    if (data?.currentUser?.role === "ADMIN" && data?.lesson?.chapter?.course?.User?.role === "CONSTRUCTOR") {
+    if (
+      data?.currentUser?.role === "ADMIN" &&
+      data?.lesson?.chapter?.course?.User?.role === "CONSTRUCTOR"
+    ) {
       return false;
     }
     return true;
@@ -51,7 +54,8 @@ export default function LessonPage({
           >
             <ArrowRight className="h-4 w-4 cursor-pointer" />
             <span>العودة لاعدادات الفصل</span>
-          </Link>          <div className="flex items-center">
+          </Link>{" "}
+          <div className="flex items-center">
             <span className="border-b border-secondary text-2xl ml-4">
               {data?.lesson?.title}
             </span>

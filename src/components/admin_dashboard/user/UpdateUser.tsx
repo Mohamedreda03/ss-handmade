@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { PasswordInput } from "@/components/ui/password-input";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -122,14 +123,12 @@ export default function UpdateUser({ user }: UpdateUserRoleProps) {
           <div className="grid gap-5 lg:grid-cols-2 grid-cols-1">
             <FormField
               control={form.control}
-              name="password"
-              render={({ field }) => (
+              name="password"              render={({ field }) => (
                 <FormItem>
                   <FormLabel>كلمة المرور الجديدة (اختياري)</FormLabel>
-                  <Input
+                  <PasswordInput
                     disabled={isLoading}
                     {...field}
-                    type="password"
                     placeholder="اتركه فارغاً إذا لم تريد تغيير كلمة المرور"
                     dir="rtl"
                     className="text-right"

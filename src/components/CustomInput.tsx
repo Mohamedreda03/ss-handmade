@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Eye, EyeOff } from "lucide-react";
 import { Input } from "./ui/input";
 import { FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Control } from "react-hook-form";
+import { useState } from "react";
 
 interface CustomInputProps {
   Icon: LucideIcon;
@@ -27,6 +28,10 @@ export default function CustomInput({
   disabled,
   dir = "rtl",
 }: CustomInputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPasswordField = type === "password";
+  const inputType = isPasswordField ? (showPassword ? "text" : "password") : type || "text";
+
   return (
     <FormField
       control={control}
@@ -69,15 +74,16 @@ export default function CustomInput({
                         !error,
                     })}
                   />
-                </div>
-                <Input
+                </div>                <Input
                   {...field}
-                  type={type ? type : "text"}
+                  type={inputType}
                   className={cn(
                     "border-0 bg-transparent h-full px-4 text-base placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0",
                     {
                       "text-right": dir === "rtl",
                       "text-left": dir === "ltr",
+                      "pr-12": isPasswordField && dir === "rtl", // مساحة إضافية لزر العين في RTL
+                      "pl-12": isPasswordField && dir === "ltr", // مساحة إضافية لزر العين في LTR
                     }
                   )}
                   placeholder={placeholder}
@@ -88,6 +94,27 @@ export default function CustomInput({
                       dir === "rtl" ? "0 12px 12px 0" : "12px 0 0 12px",
                   }}
                 />
+                {isPasswordField && (
+                  <button
+                    type="button"
+                    className={cn(
+                      "absolute top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200",
+                      {
+                        "left-2": dir === "rtl",
+                        "right-2": dir === "ltr",
+                      }
+                    )}
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={disabled}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </FormControl>

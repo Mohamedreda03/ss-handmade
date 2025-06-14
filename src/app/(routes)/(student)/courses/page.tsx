@@ -2,6 +2,7 @@
 
 import { useQuery } from "react-query";
 import { useState, useEffect } from "react";
+import { useSessionCache } from "@/hooks/useSessionCache";
 import Loading from "@/components/Loading";
 import CourseCard from "@/components/CourseCard";
 import axios from "axios";
@@ -45,15 +46,19 @@ export default function CoursePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
-
+  const { session, status } = useSessionCache();
   const { data, isLoading } = useQuery({
-    queryKey: ["courses"],
+    queryKey: ["courses", session?.user?.id || "anonymous"], // استخدام "anonymous" إذا لم يكن هناك مستخدم
     queryFn: async () => {
       const data = await axios
         .get("/api/courses/courses_sub")
         .then((res) => res.data);
       return data;
     },
+    enabled: status !== "loading", // تعطيل الاستعلام حتى يتم تحميل بيانات الجلسة
+    staleTime: 1000 * 60 * 5, // 5 دقائق
+    cacheTime: 1000 * 60 * 10, // 10 دقائق
+    refetchOnWindowFocus: false, // عدم إعادة التحميل عند التركيز على النافذة
   });
 
   useEffect(() => {
@@ -141,31 +146,27 @@ export default function CoursePage() {
           <h2 className="text-xl font-bold">تصفية الدورات</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            <Input
+          <div className="relative">            <Input
               placeholder="ابحث عن دورة..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="pl-10 rtl:pr-10 rtl:pl-4"
-              disabled={isLoading}
-            />
-            <div className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5">
-              {isLoading ? (
+              disabled={isLoading || status === "loading"}
+            />            <div className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5">
+              {isLoading || status === "loading" ? (
                 <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
               ) : (
                 <Search className="h-5 w-5 text-muted-foreground" />
               )}
             </div>
-          </div>
-
-          <Select
+          </div>          <Select
             value={sortBy}
             onValueChange={handleSortChange}
-            disabled={isLoading}
+            disabled={isLoading || status === "loading"}
           >
             <SelectTrigger>
               <SelectValue placeholder="الترتيب حسب" />
-              {isLoading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+              {(isLoading || status === "loading") && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">الأحدث</SelectItem>
@@ -175,10 +176,9 @@ export default function CoursePage() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-      {/* عرض الكورسات */}
+      </div>      {/* عرض الكورسات */}
       <div className="min-h-[600px]">
-        {isLoading ? (
+        {isLoading || status === "loading" ? (
           <div className="flex items-center justify-center h-[500px]">
             <div className="flex flex-col items-center">
               <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />

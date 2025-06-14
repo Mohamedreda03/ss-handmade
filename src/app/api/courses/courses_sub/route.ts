@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
+    
     const [courses, subscriptions] = await Promise.all([
       prisma.course.findMany({
         where: {
@@ -23,11 +24,14 @@ export async function GET(req: NextRequest) {
           },
         },
       }),
-      prisma.subscription.findMany({
-        where: {
-          userId: session?.user.id,
-        },
-      }),
+      // إذا لم يكن هناك session، إرجاع مصفوفة فارغة من الاشتراكات
+      session?.user?.id 
+        ? prisma.subscription.findMany({
+            where: {
+              userId: session.user.id,
+            },
+          })
+        : Promise.resolve([]),
     ]);
 
     return NextResponse.json({ courses, subscriptions });

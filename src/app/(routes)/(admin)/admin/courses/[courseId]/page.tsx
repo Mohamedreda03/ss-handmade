@@ -27,14 +27,24 @@ export default function CoursePage({
       return data;
     },
   });
-
   if (isLoading) {
     return <Loading className="h-[300px]" />;
   }
 
-  return (
-    <div className="p-5">
-      <CourseHead course={data?.course} itemsCount={data?.itemsCount as any} />
+  // تحديد ما إذا كان يمكن حذف عناصر الكورس
+  const canDeleteContent = () => {
+    if (data?.currentUser?.role === "ADMIN" && data?.course?.User?.role === "CONSTRUCTOR") {
+      return false;
+    }
+    return true;
+  };
+
+  return (    <div className="p-5">
+      <CourseHead 
+        course={data?.course} 
+        itemsCount={data?.itemsCount as any} 
+        canDelete={canDeleteContent()}
+      />
       <div className="flex flex-col md:flex-row gap-5">
         <div className="md:flex-1 flex flex-col gap-5">
           {data && (
@@ -44,12 +54,15 @@ export default function CoursePage({
               <EditImage image={data?.course?.image!} courseId={courseId} />
             </>
           )}
-        </div>
-        <div className="md:flex-1 flex flex-col gap-5">
+        </div>        <div className="md:flex-1 flex flex-col gap-5">
           {data && (
             <>
               <EditPrice price={data?.course?.price!} courseId={courseId} />
-              <EditChapters courseId={courseId} items={data?.items as any} />
+              <EditChapters 
+                courseId={courseId} 
+                items={data?.items as any} 
+                canDelete={canDeleteContent()}
+              />
             </>
           )}
         </div>

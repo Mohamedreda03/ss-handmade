@@ -29,9 +29,7 @@ export async function GET(
       courseAccess.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const [course, items] = await Promise.all([
+    }    const [course, items] = await Promise.all([
       prisma.course.findUnique({
         where: {
           id: courseId,
@@ -42,6 +40,7 @@ export async function GET(
               id: true,
               name: true,
               email: true,
+              role: true,
             },
           },
         },
@@ -58,7 +57,13 @@ export async function GET(
 
     const itemsCount = items.length;
 
-    return NextResponse.json({ course, items, itemsCount });
+    // إضافة معلومات المستخدم الحالي
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, role: true },
+    });
+
+    return NextResponse.json({ course, items, itemsCount, currentUser });
   } catch (error) {
     console.log("COURSES COURSEiD ROUTE ERROR", error);
   }

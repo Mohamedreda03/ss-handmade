@@ -146,27 +146,33 @@ export default function CoursePage() {
           <h2 className="text-xl font-bold">تصفية الدورات</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">            <Input
+          <div className="relative">
+            {" "}
+            <Input
               placeholder="ابحث عن دورة..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="pl-10 rtl:pr-10 rtl:pl-4"
               disabled={isLoading || status === "loading"}
-            />            <div className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5">
+            />{" "}
+            <div className="absolute left-3 rtl:right-3 rtl:left-auto top-2.5">
               {isLoading || status === "loading" ? (
                 <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
               ) : (
                 <Search className="h-5 w-5 text-muted-foreground" />
               )}
             </div>
-          </div>          <Select
+          </div>{" "}
+          <Select
             value={sortBy}
             onValueChange={handleSortChange}
             disabled={isLoading || status === "loading"}
           >
             <SelectTrigger>
               <SelectValue placeholder="الترتيب حسب" />
-              {(isLoading || status === "loading") && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+              {(isLoading || status === "loading") && (
+                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+              )}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">الأحدث</SelectItem>
@@ -176,7 +182,8 @@ export default function CoursePage() {
             </SelectContent>
           </Select>
         </div>
-      </div>      {/* عرض الكورسات */}
+      </div>{" "}
+      {/* عرض الكورسات */}
       <div className="min-h-[600px]">
         {isLoading || status === "loading" ? (
           <div className="flex items-center justify-center h-[500px]">

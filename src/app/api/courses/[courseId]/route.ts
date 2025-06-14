@@ -137,12 +137,14 @@ export async function DELETE(
     const session = await auth();
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // التحقق من صلاحية حذف الكورس
+    }    // التحقق من صلاحية حذف الكورس
     const courseAccess = await prisma.course.findUnique({
       where: { id: courseId },
-      select: { userId: true },
+      include: {
+        User: {
+          select: { role: true },
+        },
+      },
     });
 
     if (!courseAccess) {
@@ -155,6 +157,14 @@ export async function DELETE(
       courseAccess.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // إذا كان admin ولكن الكورس مملوك لـ contractor، منع الحذف
+    if (
+      session.user.role === "ADMIN" &&
+      courseAccess.User?.role === "CONSTRUCTOR"
+    ) {
+      return new NextResponse("Cannot delete contractor content", { status: 403 });
     }
 
     // استرجاع الـ Course والعلاقات المرتبطة

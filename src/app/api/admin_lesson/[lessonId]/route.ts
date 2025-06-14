@@ -34,8 +34,7 @@ export async function GET(
 
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-    const lesson = await prisma.lesson.findFirst({
+    }    const lesson = await prisma.lesson.findFirst({
       where: {
         id: lessonId,
       },
@@ -43,7 +42,14 @@ export async function GET(
         chapter: {
           include: {
             course: {
-              select: { userId: true },
+              include: {
+                User: {
+                  select: {
+                    id: true,
+                    role: true,
+                  },
+                },
+              },
             },
           },
         },
@@ -52,15 +58,20 @@ export async function GET(
 
     if (!lesson) {
       return new NextResponse("Lesson not found", { status: 404 });
-    }
-
-    // إذا كان constructor، يجب أن يكون مالك الكورس
+    }    // إذا كان constructor، يجب أن يكون مالك الكورس
     if (
       session.user.role === "CONSTRUCTOR" &&
       lesson.chapter.course.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    // إضافة معلومات المستخدم الحالي
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, role: true },
+    });
+
     let requiredFields: any[] = [];
 
     if (lesson?.type === "video") {
@@ -80,6 +91,7 @@ export async function GET(
       totalFields,
       filledFields,
       isCompleted,
+      currentUser,
     });
   } catch (error) {
     console.log("COURSES GET ERROR", error);

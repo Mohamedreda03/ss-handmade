@@ -20,10 +20,10 @@ export function useSessionCache() {
     if (previousUserId !== currentUserId) {
       // مسح الاستعلامات المرتبطة بالمستخدم السابق
       if (previousUserId) {
-        queryClient.removeQueries(['courses', previousUserId]);
-        queryClient.removeQueries(['subscriptions', previousUserId]);
-        queryClient.removeQueries(['orders', previousUserId]);
-        queryClient.removeQueries(['products', previousUserId]);
+        queryClient.removeQueries(["courses", previousUserId]);
+        queryClient.removeQueries(["subscriptions", previousUserId]);
+        queryClient.removeQueries(["orders", previousUserId]);
+        queryClient.removeQueries(["products", previousUserId]);
       }
 
       // تحديث المرجع

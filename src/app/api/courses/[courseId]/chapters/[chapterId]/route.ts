@@ -62,14 +62,17 @@ export async function DELETE(
     const session = await auth();
     if (!session || !["ADMIN", "CONSTRUCTOR"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // التحقق من صلاحية حذف الفصل
+    }    // التحقق من صلاحية حذف الفصل
     const chapterAccess = await prisma.chapter.findUnique({
       where: { id: chapterId },
       include: {
         course: {
           select: { userId: true },
+          include: {
+            User: {
+              select: { role: true },
+            },
+          },
         },
       },
     });
@@ -84,7 +87,15 @@ export async function DELETE(
       chapterAccess.course.userId !== session.user.id
     ) {
       return new NextResponse("Unauthorized", { status: 401 });
-    } // استرجاع الـ Chapter والعلاقات المرتبطة
+    }
+
+    // إذا كان admin ولكن الكورس مملوك لـ contractor، منع الحذف
+    if (
+      session.user.role === "ADMIN" &&
+      chapterAccess.course.User?.role === "CONSTRUCTOR"
+    ) {
+      return new NextResponse("Cannot delete contractor content", { status: 403 });
+    }// استرجاع الـ Chapter والعلاقات المرتبطة
     const chapter = await prisma.chapter.findUnique({
       where: {
         id: chapterId,
@@ -146,11 +157,21 @@ export async function GET(
           status: 401,
         });
       }
-    }
-
-    const chapter = await prisma.chapter.findFirst({
+    }    const chapter = await prisma.chapter.findFirst({
       where: {
         id: chapterId,
+      },
+      include: {
+        course: {
+          include: {
+            User: {
+              select: {
+                id: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -161,6 +182,12 @@ export async function GET(
       orderBy: {
         position: "asc",
       },
+    });
+
+    // إضافة معلومات المستخدم الحالي
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, role: true },
     });
 
     const requiredFields = [chapter?.title, lessons.length];
@@ -174,6 +201,7 @@ export async function GET(
       requiredFields,
       totalFields,
       filledFields,
+      currentUser,
     });
   } catch (error) {
     console.log("ERROR IN GET CHAPTERID:", error);

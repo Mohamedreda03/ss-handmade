@@ -57,10 +57,12 @@ export default function EditLessons({
   courseId,
   chapterId,
   items,
+  canDelete = true,
 }: {
   courseId: string;
   chapterId: string;
   items: any[];
+  canDelete?: boolean;
 }) {
   const [isAdd, setIsAdd] = useState(false);
   const [lessons, setLessons] = useState(items);

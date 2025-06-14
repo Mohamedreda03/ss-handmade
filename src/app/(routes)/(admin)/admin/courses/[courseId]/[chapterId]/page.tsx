@@ -25,10 +25,17 @@ export default function ChapterPage({
       return res.data;
     },
   });
-
   if (isLoading) {
     return <Loading className="h-[70vh]" />;
   }
+
+  // تحديد ما إذا كان يمكن حذف الفصل والدروس
+  const canDeleteContent = () => {
+    if (data?.currentUser?.role === "ADMIN" && data?.chapter?.course?.User?.role === "CONSTRUCTOR") {
+      return false;
+    }
+    return true;
+  };
 
   return (
     <div className="p-5">
@@ -39,21 +46,22 @@ export default function ChapterPage({
         >
           <ArrowRight className="h-4 w-4 cursor-pointer" />
           <span>العودة لاعدادات الكورس</span>
-        </Link>
-        <div className="flex items-center">
+        </Link>        <div className="flex items-center">
           <span className="border-b border-secondary text-2xl ml-4">
             {data?.chapter?.title}
           </span>
 
-          <DeleteAlert
-            buttonTitle="حذف الفصل"
-            dialogTitle="هل انت متأكد من حذف هذا الفصل؟"
-            dialogDescription="سيتم حذف جميع بيانات الفصل نهائيا"
-            apiEndpoint={`/api/courses/${courseId}/chapters/${chapterId}`}
-            toastMessage="تم حذف الفصل بنجاح"
-            redirect={`/admin/courses/${courseId}`}
-            queryKey={"chapters"}
-          />
+          {canDeleteContent() && (
+            <DeleteAlert
+              buttonTitle="حذف الفصل"
+              dialogTitle="هل انت متأكد من حذف هذا الفصل؟"
+              dialogDescription="سيتم حذف جميع بيانات الفصل نهائيا"
+              apiEndpoint={`/api/courses/${courseId}/chapters/${chapterId}`}
+              toastMessage="تم حذف الفصل بنجاح"
+              redirect={`/admin/courses/${courseId}`}
+              queryKey={"chapters"}
+            />
+          )}
 
           <IsPublishedButton
             disabled={data?.filledFields !== data?.totalFields}
@@ -71,12 +79,12 @@ export default function ChapterPage({
             courseId={courseId}
             chapterId={chapterId}
           />
-        </div>
-        <div className="md:flex-1 flex flex-col gap-5">
+        </div>        <div className="md:flex-1 flex flex-col gap-5">
           <EditLessons
             items={data?.lessons as any[]}
             courseId={courseId}
             chapterId={chapterId}
+            canDelete={canDeleteContent()}
           />
         </div>
       </div>

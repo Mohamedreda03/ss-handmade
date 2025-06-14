@@ -14,11 +14,28 @@ export default async function FilterCorses() {
   let courses: Course[] = [];
 
   if (user?.role === "ADMIN") {
-    courses = await prisma.course.findMany();
+    courses = await prisma.course.findMany({
+      include: {
+        User: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
+      },
+    });
   } else if (user?.role === "CONSTRUCTOR") {
     courses = await prisma.course.findMany({
       where: {
         userId: user.id,
+      },
+      include: {
+        User: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
       },
     });
   }
@@ -30,7 +47,7 @@ export default async function FilterCorses() {
           <p className="text-2xl">لا يوجد دورات</p>
         </div>
       )}
-      <YearCourses courses={courses} />
+      <YearCourses courses={courses} currentUser={user} />
     </div>
   );
 }

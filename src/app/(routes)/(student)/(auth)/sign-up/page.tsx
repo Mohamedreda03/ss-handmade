@@ -294,7 +294,7 @@ export default function SignUp() {
             <h1 className="text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-[#6F7354] to-[#888C69] bg-clip-text text-transparent">
                 انشئ
-              </span>
+              </span>{" "}
               <span className="bg-gradient-to-r from-[#6F7354] to-[#888C69] bg-clip-text text-transparent">
                 حسابك الآن
               </span>

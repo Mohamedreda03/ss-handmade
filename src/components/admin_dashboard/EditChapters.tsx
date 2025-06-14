@@ -41,9 +41,11 @@ const FormSchema = z.object({
 export default function EditChapters({
   courseId,
   items,
+  canDelete = true,
 }: {
   courseId: string;
   items: any[];
+  canDelete?: boolean;
 }) {
   const [isAdd, setIsAdd] = useState(false);
   const [chapters, setChapters] = useState(items);

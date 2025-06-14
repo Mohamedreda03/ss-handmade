@@ -124,47 +124,51 @@ export default function SuccessStoriesPage() {
       console.error("Error fetching filters:", error);
     }
   };
-  const fetchStories = useCallback(async (page = 1) => {
-    try {
-      setIsLoading(true);
+  const fetchStories = useCallback(
+    async (page = 1) => {
+      try {
+        setIsLoading(true);
 
-      // بناء المعاملات
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "6",
-        sortBy: sortBy,
-      });
+        // بناء المعاملات
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: "6",
+          sortBy: sortBy,
+        });
 
-      if (selectedProfession !== "all") {
-        params.append("profession", selectedProfession);
-      }
+        if (selectedProfession !== "all") {
+          params.append("profession", selectedProfession);
+        }
 
-      if (selectedCourse !== "all") {
-        params.append("course", selectedCourse);
-      }
+        if (selectedCourse !== "all") {
+          params.append("course", selectedCourse);
+        }
 
-      const response = await axios.get(
-        `/api/success-stories?${params.toString()}`
-      );
+        const response = await axios.get(
+          `/api/success-stories?${params.toString()}`
+        );
 
-      if (
-        response.data &&
-        response.data.stories &&
-        response.data.stories.length > 0
-      ) {
-        setStories(response.data.stories);
-        setPagination(response.data.pagination);
-      } else {
+        if (
+          response.data &&
+          response.data.stories &&
+          response.data.stories.length > 0
+        ) {
+          setStories(response.data.stories);
+          setPagination(response.data.pagination);
+        } else {
+          setStories(fallbackStories as unknown as SuccessStory[]);
+          setPagination(null);
+        }
+      } catch (error) {
+        console.error("Error fetching success stories:", error);
         setStories(fallbackStories as unknown as SuccessStory[]);
         setPagination(null);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching success stories:", error);
-      setStories(fallbackStories as unknown as SuccessStory[]);
-      setPagination(null);    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedProfession, selectedCourse, sortBy]);
+    },
+    [selectedProfession, selectedCourse, sortBy]
+  );
 
   useEffect(() => {
     fetchFilters();
@@ -172,7 +176,8 @@ export default function SuccessStoriesPage() {
 
   useEffect(() => {
     setCurrentPage(1); // إعادة تعيين الصفحة عند تغيير الفلاتر
-  }, [selectedProfession, selectedCourse, sortBy]);  useEffect(() => {
+  }, [selectedProfession, selectedCourse, sortBy]);
+  useEffect(() => {
     fetchStories(currentPage);
   }, [currentPage, fetchStories]);
 

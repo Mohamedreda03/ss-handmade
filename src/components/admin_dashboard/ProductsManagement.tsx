@@ -388,7 +388,8 @@ export default function ProductsManagement() {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-right">
                                     تأكيد قبول المنتج
-                                  </AlertDialogTitle>                                  <AlertDialogDescription className="text-right">
+                                  </AlertDialogTitle>{" "}
+                                  <AlertDialogDescription className="text-right">
                                     هل أنت متأكد من أنك تريد قبول منتج &quot;
                                     {product.name}&quot;؟
                                     <br />
@@ -453,7 +454,8 @@ export default function ProductsManagement() {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-right">
                                     تأكيد رفض المنتج
-                                  </AlertDialogTitle>                                  <AlertDialogDescription className="text-right">
+                                  </AlertDialogTitle>{" "}
+                                  <AlertDialogDescription className="text-right">
                                     هل أنت متأكد من أنك تريد رفض منتج &quot;
                                     {product.name}&quot;؟
                                     <br />

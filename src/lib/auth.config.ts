@@ -110,29 +110,62 @@ export default {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user && user.id) {
-        token.user = {
-          id: user.id,
-          name: user.name || "",
-          email: user.email || "",
-          role: (user as any).role || "STUDENT",
+      try {
+        // إذا كان هناك user جديد (من عملية sign-in)
+        if (user && user.id) {
+          token.user = {
+            id: user.id,
+            name: user.name || "",
+            email: user.email || "",
+            role: (user as any).role || "STUDENT",
+          };
+        }
+
+        // إرجاع token (مع أو بدون user حسب الحالة)
+        return token;
+      } catch (error) {
+        console.error("JWT callback error:", error);
+        // في حالة خطأ، نرجع token الحالي إذا كان موجود
+        // أو token أساسي لتجنب كسر NextAuth
+        return token || { user: null };
+      }
+    },
+    async session({ session, token }) {
+      try {
+        if (token?.user?.id) {
+          // فحص وجود id صحيح
+          session.user = token.user as any;
+          return session;
+        }
+
+        // إذا لم يكن هناك user صحيح، لا نرجع user property
+        // هذا سيجعل NextAuth يعتبر الجلسة غير صالحة
+        return {
+          expires: session.expires,
+          // لا user property = غير مسجل دخول
+        };
+      } catch (error) {
+        console.error("Session callback error:", error);
+
+        // في حالة أي خطأ، نرجع session بدون user
+        // هذا سيؤدي لإعادة توجيه المستخدم لتسجيل الدخول
+        return {
+          expires: session.expires,
         };
       }
-      return token;
-    },
-
-    async session({ session, token }) {
-      if (token.user) {
-        session.user = token.user as any;
-      }
-      return session;
     },
   },
   pages: {
     signIn: "/sign-in",
     signOut: "/",
+    error: "/sign-in", // توجيه جميع أخطاء Auth لصفحة تسجيل الدخول
+  },
+  // إعدادات JWT للتعامل مع مشاكل decryption
+  jwt: {
+    maxAge: 7 * 24 * 60 * 60, // 7 أيام
+    // في حالة فشل decode، سيتم إنشاء token جديد
   },
   trustHost: true,
   debug: process.env.NODE_ENV === "development",
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET || "default_secret_key", // يجب تغيير هذا في بيئة الإنتاج
 } satisfies NextAuthConfig;

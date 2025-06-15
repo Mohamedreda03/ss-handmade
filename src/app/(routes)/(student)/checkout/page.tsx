@@ -12,6 +12,7 @@ import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-hot-toast";
 import {
   Form,
   FormControl,
@@ -142,14 +143,37 @@ export default function CheckoutPage() {
           cardholderName: values.cardholderName,
           // No enviar CVV por seguridad
         },
-      });
-
-      // After creating payment, redirect to success page
+      });      // After creating payment, redirect to success page
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
       clearCart();
       router.push("/success-payment");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
+      
+      // التعامل مع أخطاء نقص الكمية
+      if (error.response?.status === 400 && error.response?.data?.error) {
+        const errorData = error.response.data;
+        if (errorData.productName) {
+          // خطأ نقص كمية منتج محدد
+          toast.error(
+            `⚠️ ${errorData.error}\n\nيرجى تعديل الكمية أو إزالة المنتج من السلة وإعادة المحاولة.`,
+            {
+              duration: 6000,
+              style: {
+                maxWidth: '500px',
+                textAlign: 'right',
+                direction: 'rtl'
+              }
+            }
+          );
+        } else {
+          // أخطاء أخرى
+          toast.error(errorData.error);
+        }
+      } else {
+        // خطأ عام
+        toast.error("حدث خطأ أثناء معالجة الطلب. يرجى المحاولة مرة أخرى.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -68,9 +68,41 @@ export async function POST(req: NextRequest) {
           userId: session.user.id,
           couponId: couponId,
           price: parseFloat(body.amount), // Store the final amount after discount
-        },
+        },      });
+    }
+
+    // فحص توفر الكميات قبل إنشاء الطلب
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { id: true, name: true, stock: true }
       });
-    } // Crear la orden asociada al pago
+
+      if (!product) {
+        return NextResponse.json(
+          { 
+            error: `المنتج غير موجود`,
+            productId: item.productId
+          },
+          { status: 400 }
+        );
+      }
+
+      if (product.stock < item.quantity) {
+        return NextResponse.json(
+          { 
+            error: `الكمية المطلوبة من المنتج "${product.name}" غير متوفرة. الكمية المطلوبة: ${item.quantity}، الكمية المتوفرة: ${product.stock}`,
+            productName: product.name,
+            productId: product.id,
+            requestedQuantity: item.quantity,
+            availableQuantity: product.stock
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Crear la orden asociada al pago
     const order = await prisma.order.create({
       data: {
         userId: user.id,

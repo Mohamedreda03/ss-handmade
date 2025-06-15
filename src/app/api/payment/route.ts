@@ -68,21 +68,22 @@ export async function POST(req: NextRequest) {
           userId: session.user.id,
           couponId: couponId,
           price: parseFloat(body.amount), // Store the final amount after discount
-        },      });
+        },
+      });
     }
 
     // فحص توفر الكميات قبل إنشاء الطلب
     for (const item of items) {
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
-        select: { id: true, name: true, stock: true }
+        select: { id: true, name: true, stock: true },
       });
 
       if (!product) {
         return NextResponse.json(
-          { 
+          {
             error: `المنتج غير موجود`,
-            productId: item.productId
+            productId: item.productId,
           },
           { status: 400 }
         );
@@ -90,12 +91,12 @@ export async function POST(req: NextRequest) {
 
       if (product.stock < item.quantity) {
         return NextResponse.json(
-          { 
+          {
             error: `الكمية المطلوبة من المنتج "${product.name}" غير متوفرة. الكمية المطلوبة: ${item.quantity}، الكمية المتوفرة: ${product.stock}`,
             productName: product.name,
             productId: product.id,
             requestedQuantity: item.quantity,
-            availableQuantity: product.stock
+            availableQuantity: product.stock,
           },
           { status: 400 }
         );

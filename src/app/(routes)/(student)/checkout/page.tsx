@@ -143,13 +143,13 @@ export default function CheckoutPage() {
           cardholderName: values.cardholderName,
           // No enviar CVV por seguridad
         },
-      });      // After creating payment, redirect to success page
+      }); // After creating payment, redirect to success page
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
       clearCart();
       router.push("/success-payment");
     } catch (error: any) {
       console.error("Payment error:", error);
-      
+
       // التعامل مع أخطاء نقص الكمية
       if (error.response?.status === 400 && error.response?.data?.error) {
         const errorData = error.response.data;
@@ -160,10 +160,10 @@ export default function CheckoutPage() {
             {
               duration: 6000,
               style: {
-                maxWidth: '500px',
-                textAlign: 'right',
-                direction: 'rtl'
-              }
+                maxWidth: "500px",
+                textAlign: "right",
+                direction: "rtl",
+              },
             }
           );
         } else {
